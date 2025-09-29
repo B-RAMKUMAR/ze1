@@ -14,7 +14,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { getSubmissions, getTasks, getUsers } from "@/lib/data";
+import { getSubmissions, getTasks } from "@/lib/data";
 import {
   LineChart,
   ClipboardCheck,
@@ -33,33 +33,37 @@ export default async function AnalyticalDashboardPage() {
   const tasks = await getTasks();
   
   const totalSubmissions = submissions.length;
+  const totalTasks = tasks.length;
+  
   const scoredSubmissions = submissions.filter(s => s.status === 'Scored' && s.score !== undefined);
   const totalScored = scoredSubmissions.length;
-  const totalTasks = tasks.length;
 
   const lateSubmissions = submissions.filter(submission => {
     const task = tasks.find(t => t.id === submission.taskId);
     if (!task) return false;
-    return new Date(submission.submittedAt) > new Date(task.eta);
+    const submittedAt = new Date(submission.submittedAt);
+    const eta = new Date(task.eta);
+    return submittedAt > eta;
   });
   const lateSubmissionCount = lateSubmissions.length;
 
-  let highestScoreSubmission: Submission | undefined;
-  let lowestScoreSubmission: Submission | undefined;
+  const highestScoreSubmission = totalScored > 0 
+    ? scoredSubmissions.reduce((max, s) => s.score! > max.score! ? s : max)
+    : null;
 
-  if (totalScored > 0) {
-    highestScoreSubmission = scoredSubmissions.reduce((max, s) => s.score! > max.score! ? s : max);
-    lowestScoreSubmission = scoredSubmissions.reduce((min, s) => s.score! < min.score! ? s : min);
-  }
+  const lowestScoreSubmission = totalScored > 0
+    ? scoredSubmissions.reduce((min, s) => s.score! < min.score! ? s : min, scoredSubmissions[0])
+    : null;
 
-  const apprenticeScores: { [key: number]: { totalScore: number; count: number; name: string } } = {};
-  for (const submission of scoredSubmissions) {
-    if (!apprenticeScores[submission.assigneeId]) {
-      apprenticeScores[submission.assigneeId] = { totalScore: 0, count: 0, name: submission.assigneeName };
+  const apprenticeScores = scoredSubmissions.reduce((acc, submission) => {
+    const { assigneeId, assigneeName, score } = submission;
+    if (!acc[assigneeId]) {
+      acc[assigneeId] = { name: assigneeName, totalScore: 0, count: 0 };
     }
-    apprenticeScores[submission.assigneeId].totalScore += submission.score!;
-    apprenticeScores[submission.assigneeId].count += 1;
-  }
+    acc[assigneeId].totalScore += score!;
+    acc[assigneeId].count++;
+    return acc;
+  }, {} as { [key: number]: { name: string, totalScore: number; count: number } });
 
   const topPerformers = Object.values(apprenticeScores)
     .map(apprentice => ({
@@ -71,7 +75,11 @@ export default async function AnalyticalDashboardPage() {
 
   const perTaskStats = tasks.map(task => {
     const taskSubmissions = submissions.filter(s => s.taskId === task.id);
-    const lateCount = taskSubmissions.filter(s => new Date(s.submittedAt) > new Date(task.eta)).length;
+    const lateCount = taskSubmissions.filter(s => {
+        const submittedAt = new Date(s.submittedAt);
+        const eta = new Date(task.eta);
+        return submittedAt > eta;
+    }).length;
     const scoredCount = taskSubmissions.filter(s => s.status === 'Scored').length;
     return {
         id: task.id,
@@ -202,7 +210,7 @@ export default async function AnalyticalDashboardPage() {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {scoredSubmissions.length > 0 ? scoredSubmissions.map(s => (
+                        {scoredSubmissions.length > 0 ? scoredSubmissions.slice(0, 5).map(s => (
                             <TableRow key={s.id}>
                                 <TableCell>{s.assigneeName}</TableCell>
                                 <TableCell>{s.taskTitle}</TableCell>
@@ -249,4 +257,5 @@ export default async function AnalyticalDashboardPage() {
         </Card>
     </div>
   );
-}
+  
+    
