@@ -53,7 +53,7 @@ export function LoginForm() {
             <FormItem>
               <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <Input placeholder="name@mu-sigma.com" {...field} />
+                  <Input placeholder="name@mu-sigma.com" {...field} name="email" />
                 </FormControl>
               <FormMessage />
             </FormItem>
@@ -66,7 +66,7 @@ export function LoginForm() {
             <FormItem>
               <FormLabel>Password</FormLabel>
                 <FormControl>
-                  <Input type="password" placeholder="••••••••" {...field} />
+                  <Input type="password" placeholder="••••••••" {...field} name="password" />
                 </FormControl>
               <FormMessage />
             </FormItem>
