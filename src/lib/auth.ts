@@ -4,9 +4,13 @@ import { redirect } from "next/navigation";
 import { User } from "./types";
 import { getUsers } from "./data";
 
-export async function login(formData: FormData) {
+export async function login(formData: FormData): Promise<{ error: string } | void> {
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
+
+  if (!email || !password) {
+    return { error: "Email and password are required." };
+  }
 
   const users = await getUsers();
   const user = users.find((u) => u.email.toLowerCase() === email.toLowerCase());
@@ -21,11 +25,11 @@ export async function login(formData: FormData) {
       maxAge: 60 * 60 * 24, // 1 day
       path: "/",
     });
-    redirect("/dashboard");
   } else {
-    // In a real app, you'd handle this error more gracefully
-    redirect("/login?error=Invalid%20email%20or%20password.");
+    return { error: "Invalid email or password." };
   }
+  
+  redirect("/dashboard");
 }
 
 export async function logout() {
