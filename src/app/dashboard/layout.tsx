@@ -16,21 +16,9 @@ import {
   Rocket,
 } from "lucide-react";
 import SidebarNav from "@/components/dashboard/sidebar-nav";
-import { logout } from "@/lib/auth";
+import { logout, getCurrentUser } from "@/lib/auth";
 import type { User } from "@/lib/types";
-import { cookies } from "next/headers";
-
-function getUserFromCookie(): User | null {
-    const userCookie = cookies().get("currentUser")?.value;
-    if (userCookie) {
-        try {
-            return JSON.parse(userCookie);
-        } catch (e) {
-            return null;
-        }
-    }
-    return null;
-}
+import { redirect } from "next/navigation";
 
 
 export default async function DashboardLayout({
@@ -39,15 +27,11 @@ export default async function DashboardLayout({
   children: ReactNode;
 }) {
   // The middleware now handles the redirect, so we can safely get user from cookie
-  const user = getUserFromCookie();
+  const user = await getCurrentUser();
 
   // This should theoretically not happen if middleware is correct, but as a fallback.
   if (!user) {
-    return (
-        <div className="flex h-screen w-full items-center justify-center">
-            Redirecting to login...
-        </div>
-    )
+    redirect('/login');
   }
 
   const userInitials = user.name.split(' ').map(n => n[0]).join('');
