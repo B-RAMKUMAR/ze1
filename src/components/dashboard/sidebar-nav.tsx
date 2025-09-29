@@ -14,6 +14,8 @@ import {
   FilePen,
   History,
   LineChart,
+  Trophy,
+  Upload,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -30,21 +32,24 @@ const navItems: NavItem[] = [
   { href: "/playbook", label: "Playbook", icon: BookOpen, roles: ["Apprentice", "Scorer", "Program Operator", "Program Orchestrator"] },
   
   // Apprentice
-  { href: "/dashboard/tasks", label: "My Tasks", icon: ClipboardCheck, roles: ["Apprentice"] },
+  { href: "/dashboard/tasks", label: "Active Tasks", icon: ClipboardCheck, roles: ["Apprentice"] },
   { href: "/dashboard/journal", label: "AI Journal", icon: FilePen, roles: ["Apprentice"] },
+  { href: "/dashboard/submissions", label: "Submit Deliverable", icon: Upload, roles: ["Apprentice"] },
+  { href: "/dashboard/scores", label: "My Scores", icon: Trophy, roles: ["Apprentice"] },
   
   // Scorer
   { href: "/dashboard/submissions", label: "Submissions", icon: Award, roles: ["Scorer"] },
 
   // Program Operator
   { href: "/dashboard/announcements", label: "Announcements", icon: Megaphone, roles: ["Program Operator"] },
+  { href: "/dashboard/people", label: "People Directory", icon: Users, roles: ["Program Operator"] },
   
   // Program Orchestrator
-  { href: "/dashboard/analytical", label: "Analytical Dashboard", icon: LineChart, roles: ["Program Orchestrator"] },
-  { href: "/dashboard/orchestrator-tasks", label: "Tasks", icon: ClipboardCheck, roles: ["Program Orchestrator"] },
-  { href: "/dashboard/people", label: "People", icon: Users, roles: ["Program Orchestrator"] },
-  { href: "/dashboard/orchestrator-announcements", label: "Announcements", icon: Megaphone, roles: ["Program Orchestrator"] },
-  { href: "/dashboard/scores", label: "Scores", icon: Award, roles: ["Program Orchestrator"] },
+  { href: "/dashboard/analytical", label: "Program Analytics", icon: LineChart, roles: ["Program Orchestrator"] },
+  { href: "/dashboard/orchestrator-tasks", label: "Task Management", icon: ClipboardCheck, roles: ["Program Orchestrator"] },
+  { href: "/dashboard/people", label: "People Management", icon: Users, roles: ["Program Orchestrator"] },
+  { href: "/dashboard/orchestrator-announcements", label: "Post Announcement", icon: Megaphone, roles: ["Program Orchestrator"] },
+  { href: "/dashboard/scores", label: "Scores & Leaderboard", icon: Trophy, roles: ["Program Orchestrator"] },
   { href: "/dashboard/requests", label: "Access Requests", icon: History, roles: ["Program Orchestrator"] },
 ];
 
