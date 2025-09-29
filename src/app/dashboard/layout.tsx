@@ -26,10 +26,8 @@ export default async function DashboardLayout({
 }: {
   children: ReactNode;
 }) {
-  // The middleware now handles the redirect, so we can safely get user from cookie
   const user = await getCurrentUser();
 
-  // This should theoretically not happen if middleware is correct, but as a fallback.
   if (!user) {
     redirect('/login');
   }
