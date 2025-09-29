@@ -26,19 +26,12 @@ import {
   ArrowUp,
   User,
 } from "lucide-react";
-import type { Submission, Task, User as UserType } from "@/lib/types";
-
-// Helper function to format names or return 'N/A'
-const getUserName = (users: UserType[], id: number | undefined) => {
-    if (id === undefined) return 'N/A';
-    return users.find(u => u.id === id)?.name || 'Unknown User';
-}
+import type { Submission, Task } from "@/lib/types";
 
 export default async function AnalyticalDashboardPage() {
   const submissions = await getSubmissions();
   const tasks = await getTasks();
-  const users = await getUsers();
-
+  
   const totalSubmissions = submissions.length;
   const scoredSubmissions = submissions.filter(s => s.status === 'Scored' && s.score !== undefined);
   const totalScored = scoredSubmissions.length;
