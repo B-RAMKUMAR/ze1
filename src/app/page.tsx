@@ -3,10 +3,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { BookOpen, Rocket, LogIn } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import { placeholderImages } from "@/lib/placeholder-images";
+import { PlaceHolderImages } from "@/lib/placeholder-images";
 
 export default function Home() {
-  const heroImage = placeholderImages.find(p => p.id === "hero");
+  const heroImage = PlaceHolderImages.find(p => p.id === "hero");
 
   return (
     <div className="flex flex-col min-h-screen">
