@@ -20,10 +20,12 @@ export default async function PlaybookPage() {
           <span className="text-xl font-bold tracking-tighter">ZEROS Launchpad</span>
         </Link>
         <nav className="ml-auto flex gap-4 sm:gap-6">
-          <Link href="/dashboard">
-            <Button variant="outline">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Dashboard
+          <Link href="/dashboard" passHref>
+            <Button asChild variant="outline">
+              <a>
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Back to Dashboard
+              </a>
             </Button>
           </Link>
         </nav>
