@@ -9,6 +9,7 @@ import { getAnnouncements, getTasksForUser, getSubmissions, getAccessRequests, g
 export default async function DashboardPage() {
   const user = await getCurrentUser();
 
+  // This check is important for the main dashboard page
   if (!user) {
     redirect("/login");
   }

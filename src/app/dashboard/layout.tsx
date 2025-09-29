@@ -12,23 +12,42 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
-  CircleUser,
   Menu,
   Rocket,
 } from "lucide-react";
 import SidebarNav from "@/components/dashboard/sidebar-nav";
 import { logout, getCurrentUser } from "@/lib/auth";
-import { redirect } from "next/navigation";
+import type { User } from "@/lib/types";
+import { cookies } from "next/headers";
+
+function getUserFromCookie(): User | null {
+    const userCookie = cookies().get("currentUser")?.value;
+    if (userCookie) {
+        try {
+            return JSON.parse(userCookie);
+        } catch (e) {
+            return null;
+        }
+    }
+    return null;
+}
+
 
 export default async function DashboardLayout({
   children,
 }: {
   children: ReactNode;
 }) {
-  const user = await getCurrentUser();
+  // The middleware now handles the redirect, so we can safely get user from cookie
+  const user = getUserFromCookie();
 
+  // This should theoretically not happen if middleware is correct, but as a fallback.
   if (!user) {
-    redirect("/login");
+    return (
+        <div className="flex h-screen w-full items-center justify-center">
+            Redirecting to login...
+        </div>
+    )
   }
 
   const userInitials = user.name.split(' ').map(n => n[0]).join('');
