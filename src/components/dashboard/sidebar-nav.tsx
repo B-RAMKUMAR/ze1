@@ -13,6 +13,7 @@ import {
   Megaphone,
   FilePen,
   History,
+  LineChart,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -24,14 +25,27 @@ type NavItem = {
 };
 
 const navItems: NavItem[] = [
+  // Common
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, roles: ["Apprentice", "Scorer", "Program Operator", "Program Orchestrator"] },
+  { href: "/playbook", label: "Playbook", icon: BookOpen, roles: ["Apprentice", "Scorer", "Program Operator", "Program Orchestrator"] },
+  
+  // Apprentice
   { href: "/dashboard/tasks", label: "My Tasks", icon: ClipboardCheck, roles: ["Apprentice"] },
   { href: "/dashboard/journal", label: "AI Journal", icon: FilePen, roles: ["Apprentice"] },
+  
+  // Scorer
   { href: "/dashboard/submissions", label: "Submissions", icon: Award, roles: ["Scorer"] },
-  { href: "/dashboard/users", label: "User Management", icon: Users, roles: ["Program Orchestrator"] },
-  { href: "/dashboard/announcements", label: "Announcements", icon: Megaphone, roles: ["Program Orchestrator", "Program Operator"] },
+
+  // Program Operator
+  { href: "/dashboard/announcements", label: "Announcements", icon: Megaphone, roles: ["Program Operator"] },
+  
+  // Program Orchestrator
+  { href: "/dashboard/analytical", label: "Analytical Dashboard", icon: LineChart, roles: ["Program Orchestrator"] },
+  { href: "/dashboard/orchestrator-tasks", label: "Tasks", icon: ClipboardCheck, roles: ["Program Orchestrator"] },
+  { href: "/dashboard/people", label: "People", icon: Users, roles: ["Program Orchestrator"] },
+  { href: "/dashboard/orchestrator-announcements", label: "Announcements", icon: Megaphone, roles: ["Program Orchestrator"] },
+  { href: "/dashboard/scores", label: "Scores", icon: Award, roles: ["Program Orchestrator"] },
   { href: "/dashboard/requests", label: "Access Requests", icon: History, roles: ["Program Orchestrator"] },
-  { href: "/playbook", label: "Playbook", icon: BookOpen, roles: ["Apprentice", "Scorer", "Program Operator", "Program Orchestrator"] },
 ];
 
 export default function SidebarNav({ userRole }: { userRole: UserRole }) {
