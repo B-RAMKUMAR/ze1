@@ -1,0 +1,52 @@
+export type UserRole = "Apprentice" | "Scorer" | "Program Operator" | "Program Orchestrator";
+
+export type User = {
+  id: number;
+  name: string;
+  email: string;
+  role: UserRole;
+  avatar: string;
+};
+
+export type TaskStatus = "Not Started" | "In Progress" | "Submitted" | "Scored" | "Overdue";
+
+export type Task = {
+  id: number;
+  title: string;
+  phase: string;
+  objective: string;
+  eta: string; 
+  status: TaskStatus;
+  assigneeId: number;
+  description: string;
+  score?: number;
+};
+
+export type Announcement = {
+  id: number;
+  title: string;
+  content: string;
+  date: string;
+  author: string;
+};
+
+export type Submission = {
+    id: number;
+    taskId: number;
+    taskTitle: string;
+    assigneeId: number;
+    assigneeName: string;
+    submittedAt: string;
+    status: 'Pending Score' | 'Scored';
+    fileUrl: string;
+    score?: number;
+};
+
+export type AccessRequest = {
+    id: number;
+    userId: number;
+    userName: string;
+    userEmail: string;
+    requestedAt: string;
+    status: 'Pending' | 'Approved';
+};
