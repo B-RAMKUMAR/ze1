@@ -31,6 +31,14 @@ export type Announcement = {
   author: string;
 };
 
+export type ScoreBreakdown = {
+    depth: number;
+    relevance: number;
+    applicability: number;
+    novelty: number;
+    packaging: number;
+};
+
 export type Submission = {
     id: number;
     taskId: number;
@@ -40,7 +48,8 @@ export type Submission = {
     submittedAt: string;
     status: 'Pending Score' | 'Scored';
     fileUrl: string;
-    score?: number;
+    scores?: ScoreBreakdown;
+    score?: number; // Legacy total score, can be deprecated
 };
 
 export type AccessRequest = {
