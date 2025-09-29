@@ -20,9 +20,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { getSubmissions, getTasks } from "@/lib/data";
 import type { Submission, Task } from "@/lib/types";
-import { Trophy } from "lucide-react";
+import { Trophy, Download } from "lucide-react";
+import Link from "next/link";
 
 type EnrichedSubmission = Submission & { average: number };
 
@@ -105,7 +107,8 @@ export default async function ScoresPage() {
                                     <TableHead>Applicability</TableHead>
                                     <TableHead>Novelty</TableHead>
                                     <TableHead>Packaging</TableHead>
-                                    <TableHead className="text-right">Average</TableHead>
+                                    <TableHead>Average</TableHead>
+                                    <TableHead className="text-right">Deliverable</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -117,8 +120,16 @@ export default async function ScoresPage() {
                                         <TableCell>{sub.scores.applicability}</TableCell>
                                         <TableCell>{sub.scores.novelty}</TableCell>
                                         <TableCell>{sub.scores.packaging}</TableCell>
-                                        <TableCell className="text-right font-semibold">
+                                        <TableCell>
                                             <Badge variant="secondary">{sub.average.toFixed(2)}</Badge>
+                                        </TableCell>
+                                        <TableCell className="text-right">
+                                            <Button asChild variant="outline" size="sm">
+                                                <Link href={sub.fileUrl} target="_blank">
+                                                    <Download className="mr-2 h-4 w-4" />
+                                                    View File
+                                                </Link>
+                                            </Button>
                                         </TableCell>
                                     </TableRow>
                                 ))}
