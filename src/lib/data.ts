@@ -6,22 +6,22 @@ import type { User, Task, Announcement, Submission, AccessRequest } from "@/lib/
 
 const contentDirectory = path.join(process.cwd(), "samplemd");
 
-async function readAndParseMarkdown<T>(fileName: string): Promise<{ data: T, content: string }> {
+async function readAndParseMarkdown<T>(fileName: string): Promise<{ data: { items: T[] }, content: string }> {
   const filePath = path.join(contentDirectory, fileName);
   try {
     const fileContents = await fs.readFile(filePath, "utf8");
     const { data, content } = matter(fileContents);
     const htmlContent = await marked(content);
-    return { data: data.items as T, content: htmlContent };
+    return { data: data as { items: T[] }, content: htmlContent };
   } catch (error) {
     console.error(`Error reading or parsing ${fileName}:`, error);
     // Provide a default structure on error to prevent crashes
-    return { data: [] as unknown as T, content: "" };
+    return { data: { items: [] }, content: "" };
   }
 }
 
 export async function getUsers(): Promise<User[]> {
-  const { data } = await readAndParseMarkdown<{ items: User[] }>("users.md");
+  const { data } = await readAndParseMarkdown<User>("users.md");
   return data.items || [];
 }
 
@@ -31,7 +31,7 @@ export async function getUserById(id: number): Promise<User | undefined> {
 }
 
 export async function getTasks(): Promise<Task[]> {
-  const { data } = await readAndParseMarkdown<{ items: Task[] }>("tasks.md");
+  const { data } = await readAndParseMarkdown<Task>("tasks.md");
   return data.items || [];
 }
 
@@ -41,7 +41,7 @@ export async function getTasksForUser(userId: number): Promise<Task[]> {
 }
 
 export async function getAnnouncements(): Promise<Announcement[]> {
-  const { data } = await readAndParseMarkdown<{ items: Announcement[] }>("announcements.md");
+  const { data } = await readAndParseMarkdown<Announcement>("announcements.md");
   return (data.items || []).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 }
 
@@ -54,11 +54,11 @@ export async function getPlaybook() {
 }
 
 export async function getSubmissions(): Promise<Submission[]> {
-    const { data } = await readAndParseMarkdown<{ items: Submission[] }>("submissions.md");
+    const { data } = await readAndParseMarkdown<Submission>("submissions.md");
     return data.items || [];
 }
 
 export async function getAccessRequests(): Promise<AccessRequest[]> {
-    const { data } = await readAndParseMarkdown<{ items: AccessRequest[] }>("requests.md");
+    const { data } = await readAndParseMarkdown<AccessRequest>("requests.md");
     return data.items || [];
 }

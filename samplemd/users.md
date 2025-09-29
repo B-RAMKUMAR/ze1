@@ -2,7 +2,7 @@
 items:
   - id: 1
     name: "Ramkumar Balamurugan"
-    email: "Ramkumar.balamurugan@mu-sigma.com"
+    email: "Ramkumar.Balamurugan@mu-sigma.com"
     role: "Apprentice"
     avatar: "/avatars/1.png"
     password: "pass123"
