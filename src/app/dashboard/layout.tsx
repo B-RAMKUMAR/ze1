@@ -16,7 +16,7 @@ import {
   Rocket,
 } from "lucide-react";
 import SidebarNav from "@/components/dashboard/sidebar-nav";
-import { logout, getCurrentUser } from "@/lib/auth";
+import { logout } from "@/lib/auth";
 import type { User } from "@/lib/types";
 import { cookies } from "next/headers";
 
