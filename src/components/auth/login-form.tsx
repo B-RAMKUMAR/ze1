@@ -14,7 +14,7 @@ import { login } from "@/lib/auth";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 import { AlertCircle, Loader2 } from "lucide-react";
 import { useState, useTransition } from "react";
@@ -26,11 +26,9 @@ const FormSchema = z.object({
 
 
 export function LoginForm() {
-  const searchParams = useSearchParams();
   const router = useRouter();
-  const error = searchParams.get('error');
   const [isPending, startTransition] = useTransition();
-  const [serverError, setServerError] = useState<string | null>(error);
+  const [serverError, setServerError] = useState<string | null>(null);
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -43,10 +41,7 @@ export function LoginForm() {
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
     setServerError(null);
     startTransition(async () => {
-        const formData = new FormData();
-        formData.append("email", data.email);
-        formData.append("password", data.password);
-        const result = await login(formData);
+        const result = await login(data);
         if(result?.error) {
            setServerError(result.error);
         }

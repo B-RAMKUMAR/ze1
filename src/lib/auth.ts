@@ -3,10 +3,20 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { User } from "./types";
 import { getUsers } from "./data";
+import { z } from "zod";
 
-export async function login(formData: FormData): Promise<{ error: string } | void> {
-  const email = formData.get("email") as string;
-  const password = formData.get("password") as string;
+const loginSchema = z.object({
+  email: z.string().email(),
+  password: z.string(),
+});
+
+export async function login(data: unknown): Promise<{ error: string } | { success: true }> {
+  const validation = loginSchema.safeParse(data);
+  if (!validation.success) {
+    return { error: "Invalid data format." };
+  }
+
+  const { email, password } = validation.data;
 
   if (!email || !password) {
     return { error: "Email and password are required." };
@@ -25,11 +35,11 @@ export async function login(formData: FormData): Promise<{ error: string } | voi
       maxAge: 60 * 60 * 24, // 1 day
       path: "/",
     });
+    // Redirect on success
+    redirect("/dashboard");
   } else {
     return { error: "Invalid email or password." };
   }
-  
-  redirect("/dashboard");
 }
 
 export async function logout() {
