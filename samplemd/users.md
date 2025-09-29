@@ -8,10 +8,10 @@ items:
     password: "pass123"
   - id: 2
     name: "Prafulla Dwivedi"
-    email: "Prafulla.Dwivedi@mu-sigma.com"
+    email: "admin@gmail.com"
     role: "Program Orchestrator"
     avatar: "/avatars/2.png"
-    password: "pass123"
+    password: "123456"
   - id: 3
     name: "Srijanani S"
     email: "Srijanani.S@mu-sigma.com"
