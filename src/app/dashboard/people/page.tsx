@@ -5,9 +5,13 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
+import { getUsers } from "@/lib/data";
+import PeopleManagement from "@/components/dashboard/people-management";
 import { Users } from "lucide-react";
 
-export default function PeoplePage() {
+export default async function PeoplePage() {
+  const users = await getUsers();
+
   return (
     <Card>
       <CardHeader>
@@ -16,11 +20,11 @@ export default function PeoplePage() {
           People Management
         </CardTitle>
         <CardDescription>
-          This is where people management will be displayed.
+          View, add, and manage all users in the ZEROS program.
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <p>Content for people management is under construction.</p>
+        <PeopleManagement users={users} />
       </CardContent>
     </Card>
   );
