@@ -9,7 +9,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { LoginForm } from "@/components/auth/login-form";
-import { getUsers } from "@/lib/data";
 import { Suspense } from "react";
 
 export default function LoginPage() {
@@ -25,20 +24,13 @@ export default function LoginPage() {
         <CardHeader>
           <CardTitle className="text-2xl">Login</CardTitle>
           <CardDescription>
-            Select a user to log in and access your dashboard.
+            Enter your credentials to access your dashboard.
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Suspense fallback={<div className="text-center">Loading users...</div>}>
-            <LoginFormWrapper />
-          </Suspense>
+            <LoginForm />
         </CardContent>
       </Card>
     </div>
   );
-}
-
-async function LoginFormWrapper() {
-    const users = await getUsers();
-    return <LoginForm users={users} />;
 }

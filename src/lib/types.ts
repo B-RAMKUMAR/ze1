@@ -6,6 +6,7 @@ export type User = {
   email: string;
   role: UserRole;
   avatar: string;
+  password?: string;
 };
 
 export type TaskStatus = "Not Started" | "In Progress" | "Submitted" | "Scored" | "Overdue";

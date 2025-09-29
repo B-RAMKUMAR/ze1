@@ -6,11 +6,16 @@ import { getUsers } from "./data";
 
 export async function login(formData: FormData) {
   const email = formData.get("email") as string;
-  const users = await getUsers();
-  const user = users.find((u) => u.email === email);
+  const password = formData.get("password") as string;
 
-  if (user) {
-    cookies().set("currentUser", JSON.stringify(user), {
+  const users = await getUsers();
+  const user = users.find((u) => u.email.toLowerCase() === email.toLowerCase());
+
+  if (user && user.password === password) {
+    // Omit password from the cookie
+    const { password: _password, ...userToStore } = user;
+    
+    cookies().set("currentUser", JSON.stringify(userToStore), {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       maxAge: 60 * 60 * 24, // 1 day
@@ -19,7 +24,7 @@ export async function login(formData: FormData) {
     redirect("/dashboard");
   } else {
     // In a real app, you'd handle this error more gracefully
-    redirect("/login?error=Invalid%20credentials");
+    redirect("/login?error=Invalid%20email%20or%20password.");
   }
 }
 
