@@ -5,11 +5,13 @@ import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import { LoginForm } from "@/components/auth/login-form";
 import { Suspense } from "react";
+import { Separator } from "@/components/ui/separator";
 
 export default function LoginPage() {
   return (
@@ -30,6 +32,15 @@ export default function LoginPage() {
         <CardContent>
             <LoginForm />
         </CardContent>
+        <CardFooter className="flex flex-col gap-4">
+            <Separator />
+            <div className="text-sm text-center">
+                First time logging in?{" "}
+                <Link href="/first-time-login" className="underline font-semibold text-primary">
+                    Set your password
+                </Link>
+            </div>
+        </CardFooter>
       </Card>
     </div>
   );

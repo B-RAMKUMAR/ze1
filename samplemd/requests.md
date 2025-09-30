@@ -12,4 +12,17 @@ items:
     userRole: Software Engineer
     requestedAt: '2024-09-09T16:45:00Z'
     status: Approved
+  - id: 3
+    userName: AZEEM
+    userEmail: AZEEM@mu-sigma.com
+    userRole: APPRENTICE
+    requestedAt: '2025-09-30T08:58:29.936Z'
+    status: Pending
+  - id: 4
+    userName: vignesh nayar
+    userEmail: vignesh.nayar@mu-sigma.com
+    userRole: APPRENTICE
+    requestedAt: '2025-09-30T09:02:58.191Z'
+    status: Approved
 ---
+
