@@ -49,19 +49,22 @@ import {
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { Textarea } from "@/components/ui/textarea";
-import { ClipboardCheck, PlusCircle, Edit, Trash2, CalendarIcon } from "lucide-react";
+import { PlusCircle, Edit, Trash2, CalendarIcon, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { createTaskAction, updateTaskAction, deleteTaskAction } from "@/lib/task-actions";
+import { useToast } from "@/hooks/use-toast";
 
 export default function TaskManagement({ initialTasks }: { initialTasks: Task[] }) {
   const [tasks, setTasks] = useState<Task[]>(initialTasks);
   const [isCreateDialogOpen, setCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setEditDialogOpen] = useState(false);
+  const [isPending, setIsPending] = useState(false);
 
-  // State for the currently selected task for editing or deleting
+  const { toast } = useToast();
+
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
-  // Form state for both create and edit
   const [title, setTitle] = useState("");
   const [phase, setPhase] = useState("");
   const [description, setDescription] = useState("");
@@ -99,38 +102,70 @@ export default function TaskManagement({ initialTasks }: { initialTasks: Task[] 
     setSelectedTask(task);
   };
 
-  const handleCreateOrUpdateTask = () => {
+  const handleFormSubmit = async () => {
     if (!title || !phase || !eta || !description || !objective) {
-        alert("Please fill out all required fields.");
+        toast({
+          variant: "destructive",
+          title: "Missing Fields",
+          description: "Please fill out all required fields.",
+        });
         return;
     }
     
-    if (selectedTask) { // Updating an existing task
-        const updatedTasks = tasks.map(t => 
-            t.id === selectedTask.id ? { ...t, title, phase, description, objective, status, eta: eta.toISOString() } : t
-        );
-        setTasks(updatedTasks);
-        setEditDialogOpen(false);
-    } else { // Creating a new task
-        const newTask: Task = {
-            id: tasks.length > 0 ? Math.max(...tasks.map(t => t.id)) + 1 : 101, // more robust ID
-            title,
-            phase,
-            objective,
-            eta: eta.toISOString(),
-            status,
-            assigneeId: 1, // Placeholder
-            description,
-        };
-        setTasks(prevTasks => [...prevTasks, newTask]);
-        setCreateDialogOpen(false);
+    setIsPending(true);
+
+    const taskData = {
+        id: selectedTask ? selectedTask.id : Date.now(), // Use a temporary ID for new tasks
+        title,
+        phase,
+        objective,
+        description,
+        status,
+        eta: eta.toISOString(),
+        assigneeId: 1, // Placeholder
+    };
+
+    try {
+      if (selectedTask) { // Updating
+          await updateTaskAction(taskData);
+          setTasks(tasks.map(t => t.id === selectedTask.id ? taskData : t));
+          toast({ title: "Task Updated", description: `"${title}" has been successfully updated.` });
+          setEditDialogOpen(false);
+      } else { // Creating
+          await createTaskAction(taskData);
+          setTasks(prevTasks => [...prevTasks, taskData]);
+          toast({ title: "Task Created", description: `"${title}" has been successfully published.` });
+          setCreateDialogOpen(false);
+      }
+    } catch (error) {
+       toast({
+          variant: "destructive",
+          title: "An Error Occurred",
+          description: "Failed to save the task. Please try again.",
+        });
     }
-    
+
+    setIsPending(false);
     resetForm();
   };
 
-  const deleteTask = (taskId: number) => {
-    setTasks(tasks.filter(t => t.id !== taskId));
+  const handleDeleteConfirm = async () => {
+    if (!selectedTask) return;
+    
+    setIsPending(true);
+
+    try {
+        await deleteTaskAction(selectedTask.id);
+        setTasks(tasks.filter(t => t.id !== selectedTask.id));
+        toast({ title: "Task Deleted", description: `"${selectedTask.title}" has been deleted.` });
+    } catch (error) {
+        toast({
+          variant: "destructive",
+          title: "An Error Occurred",
+          description: "Failed to delete the task. Please try again.",
+        });
+    }
+    setIsPending(false);
     setSelectedTask(null);
   };
 
@@ -208,7 +243,11 @@ export default function TaskManagement({ initialTasks }: { initialTasks: Task[] 
             </DialogHeader>
             {TaskForm}
             <DialogFooter>
-              <Button onClick={handleCreateOrUpdateTask}>Publish Task</Button>
+               <Button onClick={() => setCreateDialogOpen(false)} variant="outline">Cancel</Button>
+              <Button onClick={handleFormSubmit} disabled={isPending}>
+                {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Publish Task
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
@@ -225,72 +264,77 @@ export default function TaskManagement({ initialTasks }: { initialTasks: Task[] 
                 {TaskForm}
                 <DialogFooter>
                     <Button variant="outline" onClick={() => setEditDialogOpen(false)}>Cancel</Button>
-                    <Button onClick={handleCreateOrUpdateTask}>Save Changes</Button>
+                    <Button onClick={handleFormSubmit} disabled={isPending}>
+                       {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                       Save Changes
+                    </Button>
                 </DialogFooter>
             </DialogContent>
         </Dialog>
-
       </div>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Task Title</TableHead>
-            <TableHead>Phase</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Deadline (ETA)</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {tasks.length > 0 ? tasks.map((task) => (
-            <TableRow key={task.id}>
-              <TableCell className="font-medium">{task.title}</TableCell>
-              <TableCell>{task.phase}</TableCell>
-              <TableCell>
-                <Badge variant={task.status === "Overdue" ? "destructive" : "outline"}>
-                  {task.status}
-                </Badge>
-              </TableCell>
-              <TableCell>{format(new Date(task.eta), "PPp")}</TableCell>
-              <TableCell className="text-right space-x-2">
-                <Button variant="outline" size="icon" onClick={() => handleEditClick(task)}>
-                  <Edit className="h-4 w-4" />
-                  <span className="sr-only">Edit Task</span>
-                </Button>
-                 <AlertDialog>
+
+       <AlertDialog>
+        <AlertDialogContent>
+            <AlertDialogHeader>
+                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                    This action cannot be undone. This will permanently delete the task
+                    "{selectedTask?.title}".
+                </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+                <AlertDialogCancel onClick={() => setSelectedTask(null)}>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={handleDeleteConfirm} disabled={isPending}>
+                    {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    Continue
+                </AlertDialogAction>
+            </AlertDialogFooter>
+        </AlertDialogContent>
+
+        <Table>
+            <TableHeader>
+            <TableRow>
+                <TableHead>Task Title</TableHead>
+                <TableHead>Phase</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Deadline (ETA)</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+            </TableHeader>
+            <TableBody>
+            {tasks.length > 0 ? tasks.map((task) => (
+                <TableRow key={task.id}>
+                <TableCell className="font-medium">{task.title}</TableCell>
+                <TableCell>{task.phase}</TableCell>
+                <TableCell>
+                    <Badge variant={task.status === "Overdue" ? "destructive" : "outline"}>
+                    {task.status}
+                    </Badge>
+                </TableCell>
+                <TableCell>{format(new Date(task.eta), "PPp")}</TableCell>
+                <TableCell className="text-right space-x-2">
+                    <Button variant="outline" size="icon" onClick={() => handleEditClick(task)}>
+                    <Edit className="h-4 w-4" />
+                    <span className="sr-only">Edit Task</span>
+                    </Button>
                     <AlertDialogTrigger asChild>
                         <Button variant="destructive" size="icon" onClick={() => handleDeleteClick(task)}>
                             <Trash2 className="h-4 w-4" />
                             <span className="sr-only">Delete Task</span>
                         </Button>
                     </AlertDialogTrigger>
-                    <AlertDialogContent>
-                        <AlertDialogHeader>
-                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                            <AlertDialogDescription>
-                                This action cannot be undone. This will permanently delete the task
-                                "{selectedTask?.title}".
-                            </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                            <AlertDialogCancel onClick={() => setSelectedTask(null)}>Cancel</AlertDialogCancel>
-                            <AlertDialogAction onClick={() => deleteTask(selectedTask!.id)}>
-                                Continue
-                            </AlertDialogAction>
-                        </AlertDialogFooter>
-                    </AlertDialogContent>
-                </AlertDialog>
-              </TableCell>
-            </TableRow>
-          )) : (
-            <TableRow>
-              <TableCell colSpan={5} className="text-center">
-                No tasks have been created yet.
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+                </TableCell>
+                </TableRow>
+            )) : (
+                <TableRow>
+                <TableCell colSpan={5} className="text-center">
+                    No tasks have been created yet.
+                </TableCell>
+                </TableRow>
+            )}
+            </TableBody>
+        </Table>
+      </AlertDialog>
     </div>
   );
 }
