@@ -53,6 +53,25 @@ export async function getPlaybook() {
     return { content: htmlContent, title: data.title as string };
 }
 
+export async function getPlaybookSections(): Promise<{title: string, content: string}[]> {
+    const filePath = path.join(contentDirectory, "playbook.md");
+    const fileContents = await fs.readFile(filePath, "utf8");
+    
+    const sections = fileContents.split(/^---\s*$/gm).filter(Boolean);
+
+    const processedSections = await Promise.all(sections.map(async (section) => {
+        const { data, content } = matter(section);
+        const htmlContent = await marked(content);
+        return {
+            title: data.title || 'Untitled',
+            content: htmlContent
+        };
+    }));
+
+    return processedSections;
+}
+
+
 export async function getSubmissions(): Promise<Submission[]> {
     const { data } = await readAndParseMarkdown<Submission>("submissions.md");
     return data.items || [];

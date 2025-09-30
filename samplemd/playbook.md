@@ -1,5 +1,5 @@
 ---
-title: "ZEROS Program Playbook - Phase 0"
+title: "Overview"
 ---
 
 # Phase 0: Exploration
@@ -27,6 +27,8 @@ title: "ZEROS Program Playbook - Phase 0"
 **Duration:** 1 month
 
 ---
+title: "Schedule"
+---
 
 ## Weekly Schedule
 
@@ -39,6 +41,8 @@ title: "ZEROS Program Playbook - Phase 0"
 | 5 | Task Output Submission | Trainees expected to upload their Deliverables (Research document, Final presentation etc) to platform | Day 4 (by 11:59 PM) |
 | 6 | Review | Upon completion, each trainee must present their output to any employee on the Musigma floor, who will review and assign a score based on the quality of work. | Day 5 |
 
+---
+title: "Tasks"
 ---
 
 ## Task Details
@@ -78,14 +82,14 @@ This document outlines the phases of skill acquisition and the associated task b
 - **Vulnerability and Humility:** Encouraged to openly acknowledge unknowns and seek help without hesitation
 
 ---
+title: "Scoring"
+---
 
 ## Review
 
 - Each trainee can receive a review for their day-to-day tasks or weekly tasks.
 - Reviews will be provided by Mu Sigma employees, starting from the TDS2 position up to AL level.
 - The review score will increase in geometric progression based on the reviewer’s experience level.
-
----
 
 ## Scoring Logic
 
@@ -118,6 +122,8 @@ This document outlines the phases of skill acquisition and the associated task b
 |:---|:---|:---|:---|
 | **Weight** | 0 for TDS1, 1 and increasing for TDS2 onwards. Increments in Geometric progression. | 1 for all, unless specified for a particular task | 1 till ETA, reduces below 1 for each day after ETA, in a Harmonic progression. |
 
+---
+title: "Links"
 ---
 
 ## Important Links
