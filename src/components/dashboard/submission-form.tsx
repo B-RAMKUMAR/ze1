@@ -45,6 +45,7 @@ export default function SubmissionForm({ task, user, initialSubmission, isDeadli
   const [isEditing, setIsEditing] = useState(!initialSubmission);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -61,7 +62,8 @@ export default function SubmissionForm({ task, user, initialSubmission, isDeadli
     }
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     if (!selectedFile) {
       toast({
         variant: "destructive",
@@ -71,22 +73,28 @@ export default function SubmissionForm({ task, user, initialSubmission, isDeadli
       return;
     }
 
+    const formData = new FormData(event.currentTarget);
+    
     startTransition(async () => {
       try {
-        await createSubmissionAction({
-          submissionId: initialSubmission?.id,
-          taskId: task.id,
-          taskTitle: task.title,
-          assigneeId: user.id,
-          assigneeName: user.name,
-        });
+        const result = await createSubmissionAction(formData);
 
-        toast({
-          title: `Submission ${initialSubmission ? 'Updated' : 'Successful'}!`,
-          description: `Your deliverable for "${task.title}" has been submitted.`,
-        });
-        setIsSubmitted(true);
-        setIsEditing(false);
+        if (result.success) {
+            toast({
+              title: `Submission ${initialSubmission ? 'Updated' : 'Successful'}!`,
+              description: `Your deliverable for "${task.title}" has been submitted.`,
+            });
+            setIsSubmitted(true);
+            setIsEditing(false);
+            setSelectedFile(null);
+            // You might need to reload or re-fetch data to get the updated initialSubmission
+        } else {
+             toast({
+              variant: "destructive",
+              title: "Submission Failed",
+              description: result.error || "There was an error submitting your deliverable. Please try again.",
+            });
+        }
       } catch (error) {
         console.error(error);
         toast({
@@ -98,8 +106,8 @@ export default function SubmissionForm({ task, user, initialSubmission, isDeadli
     });
   };
   
-  const cardBg = isSubmitted ? "bg-green-50 dark:bg-green-900/20" : "bg-muted/50";
-  const cardBorder = isSubmitted ? "border-green-200 dark:border-green-800" : "";
+  const cardBg = isSubmitted && !isEditing ? "bg-green-50 dark:bg-green-900/20" : "bg-muted/50";
+  const cardBorder = isSubmitted && !isEditing ? "border-green-200 dark:border-green-800" : "";
 
   return (
     <Card className={`${cardBg} ${cardBorder}`}>
@@ -123,10 +131,16 @@ export default function SubmissionForm({ task, user, initialSubmission, isDeadli
             )}
             
             {isEditing && !isDeadlinePassed && (
-              <>
+              <form onSubmit={handleSubmit} ref={formRef} className="space-y-4">
+                <input type="hidden" name="submissionId" value={initialSubmission?.id} />
+                <input type="hidden" name="taskId" value={task.id} />
+                <input type="hidden" name="taskTitle" value={task.title} />
+                <input type="hidden" name="assigneeId" value={user.id} />
+                <input type="hidden" name="assigneeName" value={user.name} />
+
                 <div className="flex flex-col sm:flex-row items-center gap-4">
-                    <Input type="file" ref={fileInputRef} onChange={handleFileChange} className="max-w-xs"/>
-                    <Button onClick={handleSubmit} disabled={isPending || !selectedFile} className="w-full sm:w-auto">
+                    <Input type="file" name="file" ref={fileInputRef} onChange={handleFileChange} className="max-w-xs"/>
+                    <Button type="submit" disabled={isPending || !selectedFile} className="w-full sm:w-auto">
                         {isPending ? (
                             <>
                                 <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Submitting...
@@ -145,7 +159,7 @@ export default function SubmissionForm({ task, user, initialSubmission, isDeadli
                         <span>{selectedFile.name}</span>
                     </div>
                 )}
-              </>
+              </form>
             )}
             
             {isSubmitted && !isEditing && (
