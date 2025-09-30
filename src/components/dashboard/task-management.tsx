@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -21,6 +22,17 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -36,138 +48,187 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import { Textarea } from "@/components/ui/textarea";
 import { ClipboardCheck, PlusCircle, Edit, Trash2, CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 
 export default function TaskManagement({ initialTasks }: { initialTasks: Task[] }) {
   const [tasks, setTasks] = useState<Task[]>(initialTasks);
-  const [open, setOpen] = useState(false);
+  const [isCreateDialogOpen, setCreateDialogOpen] = useState(false);
+  const [isEditDialogOpen, setEditDialogOpen] = useState(false);
 
-  // Form state
+  // State for the currently selected task for editing or deleting
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+
+  // Form state for both create and edit
   const [title, setTitle] = useState("");
   const [phase, setPhase] = useState("");
+  const [description, setDescription] = useState("");
+  const [objective, setObjective] = useState("");
   const [status, setStatus] = useState<Task["status"]>("Not Started");
   const [eta, setEta] = useState<Date>();
 
-  const handleCreateTask = () => {
-    // Basic validation
-    if (!title || !phase || !eta) {
+  const resetForm = () => {
+    setTitle("");
+    setPhase("");
+    setDescription("");
+    setObjective("");
+    setStatus("Not Started");
+    setEta(undefined);
+    setSelectedTask(null);
+  };
+
+  const handleCreateClick = () => {
+    resetForm();
+    setCreateDialogOpen(true);
+  };
+
+  const handleEditClick = (task: Task) => {
+    setSelectedTask(task);
+    setTitle(task.title);
+    setPhase(task.phase);
+    setDescription(task.description);
+    setObjective(task.objective)
+    setStatus(task.status);
+    setEta(new Date(task.eta));
+    setEditDialogOpen(true);
+  };
+  
+  const handleDeleteClick = (task: Task) => {
+    setSelectedTask(task);
+  };
+
+  const handleCreateOrUpdateTask = () => {
+    if (!title || !phase || !eta || !description || !objective) {
         alert("Please fill out all required fields.");
         return;
     }
     
-    const newTask: Task = {
-        id: tasks.length + 101, // simple ID generation
-        title,
-        phase,
-        objective: "New task objective", // Placeholder
-        eta: eta.toISOString(),
-        status,
-        assigneeId: 1, // Placeholder
-        description: "New task description", // Placeholder
-    };
-
-    setTasks(prevTasks => [...prevTasks, newTask]);
-    setOpen(false);
+    if (selectedTask) { // Updating an existing task
+        const updatedTasks = tasks.map(t => 
+            t.id === selectedTask.id ? { ...t, title, phase, description, objective, status, eta: eta.toISOString() } : t
+        );
+        setTasks(updatedTasks);
+        setEditDialogOpen(false);
+    } else { // Creating a new task
+        const newTask: Task = {
+            id: tasks.length > 0 ? Math.max(...tasks.map(t => t.id)) + 1 : 101, // more robust ID
+            title,
+            phase,
+            objective,
+            eta: eta.toISOString(),
+            status,
+            assigneeId: 1, // Placeholder
+            description,
+        };
+        setTasks(prevTasks => [...prevTasks, newTask]);
+        setCreateDialogOpen(false);
+    }
     
-    // Reset form
-    setTitle("");
-    setPhase("");
-    setStatus("Not Started");
-    setEta(undefined);
+    resetForm();
   };
+
+  const deleteTask = (taskId: number) => {
+    setTasks(tasks.filter(t => t.id !== taskId));
+    setSelectedTask(null);
+  };
+
+  const TaskForm = (
+    <div className="grid gap-4 py-4">
+        <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="title" className="text-right">Task Title</Label>
+            <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} className="col-span-3" placeholder="e.g., D3-T1: Final Model Deployment"/>
+        </div>
+        <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="phase" className="text-right">Phase</Label>
+            <Input id="phase" value={phase} onChange={(e) => setPhase(e.target.value)} className="col-span-3" placeholder="Phase 3: Ownership"/>
+        </div>
+        <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="objective" className="text-right">Objective</Label>
+            <Input id="objective" value={objective} onChange={(e) => setObjective(e.target.value)} className="col-span-3" placeholder="Task's main goal"/>
+        </div>
+         <div className="grid grid-cols-4 items-start gap-4">
+            <Label htmlFor="description" className="text-right pt-2">Description</Label>
+            <Textarea id="description" value={description} onChange={(e) => setDescription(e.target.value)} className="col-span-3" placeholder="Detailed task description"/>
+        </div>
+        <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="status" className="text-right">Status</Label>
+            <Select onValueChange={(value: Task["status"]) => setStatus(value)} value={status}>
+                <SelectTrigger className="col-span-3">
+                    <SelectValue placeholder="Select a status" />
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectItem value="Not Started">Not Started</SelectItem>
+                    <SelectItem value="In Progress">In Progress</SelectItem>
+                    <SelectItem value="Submitted">Submitted</SelectItem>
+                    <SelectItem value="Scored">Scored</SelectItem>
+                    <SelectItem value="Overdue">Overdue</SelectItem>
+                </SelectContent>
+            </Select>
+        </div>
+        <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="eta" className="text-right">Deadline (ETA)</Label>
+            <Popover>
+                <PopoverTrigger asChild>
+                    <Button
+                    variant={"outline"}
+                    className={cn(
+                        "w-[240px] justify-start text-left font-normal",
+                        !eta && "text-muted-foreground"
+                    )}
+                    >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {eta ? format(eta, "PPP") : <span>Pick a date</span>}
+                    </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar mode="single" selected={eta} onSelect={setEta} initialFocus />
+                </PopoverContent>
+            </Popover>
+        </div>
+    </div>
+  );
 
   return (
     <div className="space-y-4">
       <div className="flex justify-end">
-        <Dialog open={open} onOpenChange={setOpen}>
+        <Dialog open={isCreateDialogOpen} onOpenChange={setCreateDialogOpen}>
           <DialogTrigger asChild>
-            <Button>
+            <Button onClick={handleCreateClick}>
               <PlusCircle className="mr-2 h-4 w-4" /> Create New Task
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
+          <DialogContent className="sm:max-w-[500px]">
             <DialogHeader>
               <DialogTitle>Create New Task</DialogTitle>
               <DialogDescription>
                 Fill in the details below to create and publish a new task.
               </DialogDescription>
             </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="title" className="text-right">
-                  Task Title
-                </Label>
-                <Input
-                  id="title"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  className="col-span-3"
-                  placeholder="e.g., D3-T1: Final Model Deployment"
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="phase" className="text-right">
-                  Phase
-                </Label>
-                <Input
-                  id="phase"
-                  value={phase}
-                  onChange={(e) => setPhase(e.target.value)}
-                  className="col-span-3"
-                  placeholder="Phase 3: Ownership"
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="status" className="text-right">
-                  Status
-                </Label>
-                <Select onValueChange={(value: Task["status"]) => setStatus(value)} defaultValue={status}>
-                  <SelectTrigger className="col-span-3">
-                    <SelectValue placeholder="Select a status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Not Started">Not Started</SelectItem>
-                    <SelectItem value="In Progress">In Progress</SelectItem>
-                    <SelectItem value="Overdue">Overdue</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="eta" className="text-right">
-                  Deadline (ETA)
-                </Label>
-                <Popover>
-                    <PopoverTrigger asChild>
-                        <Button
-                        variant={"outline"}
-                        className={cn(
-                            "w-[240px] justify-start text-left font-normal",
-                            !eta && "text-muted-foreground"
-                        )}
-                        >
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {eta ? format(eta, "PPP") : <span>Pick a date</span>}
-                        </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                            mode="single"
-                            selected={eta}
-                            onSelect={setEta}
-                            initialFocus
-                        />
-                    </PopoverContent>
-                </Popover>
-              </div>
-            </div>
+            {TaskForm}
             <DialogFooter>
-              <Button onClick={handleCreateTask}>Publish Task</Button>
+              <Button onClick={handleCreateOrUpdateTask}>Publish Task</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
+
+        {/* Edit Dialog */}
+        <Dialog open={isEditDialogOpen} onOpenChange={setEditDialogOpen}>
+            <DialogContent className="sm:max-w-[500px]">
+                <DialogHeader>
+                    <DialogTitle>Edit Task</DialogTitle>
+                    <DialogDescription>
+                        Update the details for this task.
+                    </DialogDescription>
+                </DialogHeader>
+                {TaskForm}
+                <DialogFooter>
+                    <Button variant="outline" onClick={() => setEditDialogOpen(false)}>Cancel</Button>
+                    <Button onClick={handleCreateOrUpdateTask}>Save Changes</Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+
       </div>
       <Table>
         <TableHeader>
@@ -191,14 +252,33 @@ export default function TaskManagement({ initialTasks }: { initialTasks: Task[] 
               </TableCell>
               <TableCell>{format(new Date(task.eta), "PPp")}</TableCell>
               <TableCell className="text-right space-x-2">
-                <Button variant="outline" size="icon">
+                <Button variant="outline" size="icon" onClick={() => handleEditClick(task)}>
                   <Edit className="h-4 w-4" />
                   <span className="sr-only">Edit Task</span>
                 </Button>
-                <Button variant="destructive" size="icon">
-                  <Trash2 className="h-4 w-4" />
-                  <span className="sr-only">Delete Task</span>
-                </Button>
+                 <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                        <Button variant="destructive" size="icon" onClick={() => handleDeleteClick(task)}>
+                            <Trash2 className="h-4 w-4" />
+                            <span className="sr-only">Delete Task</span>
+                        </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                        <AlertDialogHeader>
+                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                                This action cannot be undone. This will permanently delete the task
+                                "{selectedTask?.title}".
+                            </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                            <AlertDialogCancel onClick={() => setSelectedTask(null)}>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => deleteTask(selectedTask!.id)}>
+                                Continue
+                            </AlertDialogAction>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
               </TableCell>
             </TableRow>
           )) : (
