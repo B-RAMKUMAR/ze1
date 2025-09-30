@@ -2,7 +2,6 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Book, Calendar, ClipboardCheck, Trophy, Link as LinkIcon } from "lucide-react";
 
 type PlaybookSection = {
   title: string;
@@ -18,6 +17,7 @@ export default function PlaybookTabs({ sections }: { sections: PlaybookSection[]
         <Tabs defaultValue={sections[0]?.title || 'Overview'} className="w-full">
             <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 h-auto">
               {sections.map((section) => {
+                if (section.title === 'Untitled') return null;
                 return (
                   <TabsTrigger key={section.title} value={section.title} className="py-3 text-base">
                      {section.title}
