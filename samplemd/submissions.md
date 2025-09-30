@@ -21,8 +21,16 @@ items:
     assigneeId: 5
     assigneeName: NagaSamrudh Meda
     submittedAt: '2024-10-14T11:23:00Z'
-    status: Pending Score
+    status: Scored
     fileUrl: /mock-deliverable.txt
+    scores:
+      depth: 8
+      relevance: 8
+      applicability: 8
+      novelty: 8
+      packaging: 8
+    score: 80
+    scorer: Srijanani S
   - id: 3
     taskId: 105
     taskTitle: Onboarding Documentation Review

@@ -63,12 +63,12 @@ items:
     phase: 'Phase 2: Contribution'
     objective: Increase test coverage for the authentication service.
     eta: '2024-10-15T23:59:59Z'
-    status: Submitted
+    status: Scored
     assigneeId: 5
     description: >-
       The `auth.service.ts` file has low test coverage. Write a new unit test
       for the `verifyToken` function to cover edge cases.
-    score: 92
+    score: 80
   - id: 1759215097145
     title: D1
     phase: D1

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import type { Submission, ScoreBreakdown } from "@/lib/types";
 import {
   Table,
@@ -18,7 +18,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
@@ -38,7 +37,7 @@ export default function ScoreSubmissionForm({ submissions, scorerName }: { submi
     novelty: 5,
     packaging: 5,
   });
-  const [isPending, setPending] = useState(false);
+  const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
 
   const handleScoreClick = (submission: Submission) => {
@@ -54,29 +53,27 @@ export default function ScoreSubmissionForm({ submissions, scorerName }: { submi
   const handleSubmitScore = async () => {
     if (!selectedSubmission) return;
 
-    setPending(true);
+    startTransition(async () => {
+        const result = await updateScoresAction({
+            submissionId: selectedSubmission.id,
+            scores: scores,
+            scorerName: scorerName
+        });
 
-    const result = await updateScoresAction({
-        submissionId: selectedSubmission.id,
-        scores: scores,
-        scorerName: scorerName
+        if (result.success) {
+            toast({
+                title: "Scores Submitted",
+                description: `Scores for ${selectedSubmission.assigneeName} on "${selectedSubmission.taskTitle}" have been recorded.`,
+            });
+            setDialogOpen(false);
+        } else {
+            toast({
+                variant: "destructive",
+                title: "Error",
+                description: result.error || "Failed to submit scores.",
+            });
+        }
     });
-
-    if (result.success) {
-        toast({
-            title: "Scores Submitted",
-            description: `Scores for ${selectedSubmission.assigneeName} on "${selectedSubmission.taskTitle}" have been recorded.`,
-        });
-        setDialogOpen(false);
-    } else {
-        toast({
-            variant: "destructive",
-            title: "Error",
-            description: result.error || "Failed to submit scores.",
-        });
-    }
-
-    setPending(false);
   }
 
   const scoreCategories: { id: keyof ScoreBreakdown; label: string }[] = [
