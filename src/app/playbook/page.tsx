@@ -5,15 +5,13 @@ import Link from "next/link";
 import {
   Card,
   CardContent,
-  CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
 
 export default async function PlaybookPage() {
   const { content, title } = await getPlaybook();
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen bg-muted/20">
       <header className="px-4 lg:px-6 h-16 flex items-center border-b sticky top-0 bg-background/95 backdrop-blur-sm z-10">
         <Link href="/" className="flex items-center justify-center gap-2">
           <Rocket className="h-6 w-6 text-accent" />
@@ -30,18 +28,25 @@ export default async function PlaybookPage() {
       </header>
 
       <main className="flex-1 container mx-auto py-12 px-4 md:px-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-3xl md:text-4xl font-bold tracking-tighter">{title}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div
-              className="prose prose-invert max-w-none prose-h1:text-3xl prose-h2:text-2xl prose-h2:border-b prose-h2:pb-2 prose-h2:mt-10 prose-h3:text-xl prose-p:text-muted-foreground prose-a:text-accent prose-strong:text-foreground"
-              dangerouslySetInnerHTML={{ __html: content }}
-            />
-          </CardContent>
+        <div className="text-center mb-12">
+            <h1 className="text-4xl md:text-5xl font-extrabold tracking-tighter text-primary">{title}</h1>
+            <p className="mt-4 text-lg text-muted-foreground max-w-3xl mx-auto">Your comprehensive guide to Phase 0 of the ZEROS Program. Understand the objectives, schedule, and scoring.</p>
+        </div>
+        
+        <Card className="shadow-lg">
+            <CardContent className="p-6 md:p-8">
+                 <div
+                    className="prose dark:prose-invert max-w-none prose-h1:text-3xl prose-h2:text-2xl prose-h2:border-b prose-h2:pb-4 prose-h2:mt-12 prose-h2:mb-6 prose-h3:text-xl prose-p:text-lg prose-p:leading-relaxed prose-a:text-accent hover:prose-a:text-accent/90 prose-strong:text-foreground prose-table:border prose-th:p-3 prose-td:p-3 prose-th:bg-muted"
+                    dangerouslySetInnerHTML={{ __html: content }}
+                    />
+            </CardContent>
         </Card>
       </main>
+       <footer className="py-6 border-t bg-background">
+            <div className="container mx-auto text-center text-sm text-muted-foreground">
+                &copy; 2024 Mu Sigma University ZEROS Program.
+            </div>
+        </footer>
     </div>
   );
 }
