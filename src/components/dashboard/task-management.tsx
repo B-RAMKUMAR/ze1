@@ -58,12 +58,10 @@ import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { createTaskAction, updateTaskAction, deleteTaskAction } from "@/lib/task-actions";
 import { useToast } from "@/hooks/use-toast";
-import Link from "next/link";
 
 export default function TaskManagement({ 
   initialTasks,
   allSubmissions,
-  apprentices
 }: { 
   initialTasks: Task[];
   allSubmissions: Submission[];
@@ -86,7 +84,6 @@ export default function TaskManagement({
   const [objective, setObjective] = useState("");
   const [status, setStatus] = useState<Task["status"]>("Not Started");
   const [eta, setEta] = useState<Date>();
-  const [assigneeId, setAssigneeId] = useState<number>(1);
 
   const resetForm = () => {
     setTitle("");
@@ -96,7 +93,6 @@ export default function TaskManagement({
     setStatus("Not Started");
     setEta(undefined);
     setSelectedTask(null);
-    setAssigneeId(1);
   };
 
   const handleCreateClick = () => {
@@ -112,7 +108,6 @@ export default function TaskManagement({
     setObjective(task.objective);
     setStatus(task.status);
     setEta(new Date(task.eta));
-    setAssigneeId(task.assigneeId);
     setEditDialogOpen(true);
   };
   
@@ -127,7 +122,7 @@ export default function TaskManagement({
   };
 
   const handleFormSubmit = async () => {
-    if (!title || !phase || !eta || !description || !objective || !assigneeId) {
+    if (!title || !phase || !eta || !description || !objective) {
         toast({
           variant: "destructive",
           title: "Missing Fields",
@@ -146,7 +141,6 @@ export default function TaskManagement({
         description,
         status,
         eta: eta.toISOString(),
-        assigneeId,
         submissionCount: selectedTask?.submissionCount || 0,
     };
 
@@ -212,19 +206,6 @@ export default function TaskManagement({
          <div className="grid grid-cols-4 items-start gap-4">
             <Label htmlFor="description" className="text-right pt-2">Description</Label>
             <Textarea id="description" value={description} onChange={(e) => setDescription(e.target.value)} className="col-span-3" placeholder="Detailed task description"/>
-        </div>
-        <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="assignee" className="text-right">Assignee</Label>
-            <Select onValueChange={(value) => setAssigneeId(Number(value))} value={String(assigneeId)}>
-                <SelectTrigger className="col-span-3">
-                    <SelectValue placeholder="Select an apprentice" />
-                </SelectTrigger>
-                <SelectContent>
-                    {apprentices.map(apprentice => (
-                        <SelectItem key={apprentice.id} value={String(apprentice.id)}>{apprentice.name}</SelectItem>
-                    ))}
-                </SelectContent>
-            </Select>
         </div>
         <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="status" className="text-right">Status</Label>
@@ -380,7 +361,6 @@ export default function TaskManagement({
           <TableHeader>
           <TableRow>
               <TableHead>Task Title</TableHead>
-              <TableHead>Assignee</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Submissions</TableHead>
               <TableHead>Deadline (ETA)</TableHead>
@@ -389,11 +369,9 @@ export default function TaskManagement({
           </TableHeader>
           <TableBody>
           {tasks.length > 0 ? tasks.map((task) => {
-              const assignee = apprentices.find(a => a.id === task.assigneeId);
               return (
               <TableRow key={task.id}>
               <TableCell className="font-medium">{task.title}</TableCell>
-              <TableCell>{assignee?.name || 'N/A'}</TableCell>
               <TableCell>
                   <Badge variant={task.status === "Overdue" ? "destructive" : "outline"}>
                   {task.status}
@@ -429,7 +407,7 @@ export default function TaskManagement({
           )
           }) : (
               <TableRow>
-              <TableCell colSpan={6} className="text-center">
+              <TableCell colSpan={5} className="text-center">
                   No tasks have been created yet.
               </TableCell>
               </TableRow>
@@ -439,5 +417,3 @@ export default function TaskManagement({
     </div>
   );
 }
-
-    

@@ -68,13 +68,13 @@ export async function createSubmissionAction(input: CreateSubmissionInput): Prom
     // 4. Update the task status to 'Submitted'
     const { data: tasksData, content: tasksContent } = await readTasksFile();
     const tasks = tasksData.items || [];
-    const taskIndex = tasks.findIndex(t => t.id === input.taskId && t.assigneeId === input.assigneeId);
+    const taskIndex = tasks.findIndex(t => t.id === input.taskId);
 
     if (taskIndex !== -1) {
         tasks[taskIndex].status = "Submitted";
         await writeTasksFile(tasks, tasksContent);
     } else {
-        console.warn(`Task not found for submission: taskId=${input.taskId}, assigneeId=${input.assigneeId}`);
+        console.warn(`Task not found for submission: taskId=${input.taskId}`);
     }
 
     // 5. Revalidate paths to refresh data across the app
