@@ -42,12 +42,14 @@ const navItems: NavItem[] = [
 
   // Program Operator
   { href: "/dashboard/orchestrator-tasks", label: "Tasks", icon: ClipboardCheck, roles: ["Program Operator"] },
-  { href: "/dashboard/announcements", label: "Announcements", icon: Megaphone, roles: ["Program Operator"] },
+  { href: "/dashboard/operator-announcements", label: "Announcements", icon: Megaphone, roles: ["Program Operator"] },
   { href: "/dashboard/people", label: "People Directory", icon: Users, roles: ["Program Operator"] },
+  
+  // Program Orchestrator & Operator
   { href: "/dashboard/scores", label: "Scores & Leaderboard", icon: Trophy, roles: ["Program Operator", "Program Orchestrator"] },
+  { href: "/dashboard/analytical", label: "Program Analytics", icon: LineChart, roles: ["Program Orchestrator", "Program Operator"] },
   
   // Program Orchestrator
-  { href: "/dashboard/analytical", label: "Program Analytics", icon: LineChart, roles: ["Program Orchestrator", "Program Operator"] },
   { href: "/dashboard/orchestrator-tasks", label: "Task Management", icon: ClipboardCheck, roles: ["Program Orchestrator"] },
   { href: "/dashboard/people", label: "People Management", icon: Users, roles: ["Program Orchestrator"] },
   { href: "/dashboard/orchestrator-announcements", label: "Post Announcement", icon: Megaphone, roles: ["Program Orchestrator"] },
@@ -58,19 +60,21 @@ export default function SidebarNav({ userRole }: { userRole: UserRole }) {
   const accessibleNavItems = navItems.filter(item => {
     if (!item.roles.includes(userRole)) return false;
 
-    // Special rule for Orchestrator: show "Task Management" instead of "Tasks"
-    if (userRole === 'Program Orchestrator' && item.href === '/dashboard/orchestrator-tasks' && item.label === 'Tasks') return false;
-    if (userRole === 'Program Operator' && item.href === '/dashboard/orchestrator-tasks' && item.label === 'Task Management') return false;
-    
-    // Special rule for Orchestrator: show "People Management" instead of "People Directory"
-    if (userRole === 'Program Orchestrator' && item.href === '/dashboard/people' && item.label === 'People Directory') return false;
-    if (userRole === 'Program Operator' && item.href === '/dashboard/people' && item.label === 'People Management') return false;
+    // Remove duplicates and apply specific labels based on roles
+    const isOperator = userRole === 'Program Operator';
+    const isOrchestrator = userRole === 'Program Orchestrator';
 
-     // Special rule for Orchestrator: show "Post Announcement" instead of "Announcements"
-    if (userRole === 'Program Orchestrator' && item.href === '/dashboard/orchestrator-announcements') return true;
-    if (userRole === 'Program Operator' && item.href === '/dashboard/orchestrator-announcements') return false;
-    if (userRole === 'Program Operator' && item.href === '/dashboard/announcements') return true;
+    // Task Management vs Tasks
+    if (item.href === '/dashboard/orchestrator-tasks') {
+      if (isOperator && item.label === 'Task Management') return false;
+      if (isOrchestrator && item.label === 'Tasks') return false;
+    }
 
+    // People Management vs People Directory
+    if (item.href === '/dashboard/people') {
+      if (isOperator && item.label === 'People Management') return false;
+      if (isOrchestrator && item.label === 'People Directory') return false;
+    }
 
     return true;
   });
