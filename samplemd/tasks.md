@@ -74,7 +74,7 @@ items:
     phase: D1
     objective: C1
     description: JBVJV
-    status: In Progress
+    status: Submitted
     eta: '2025-10-01T18:30:00.000Z'
     assigneeId: 1
 ---
