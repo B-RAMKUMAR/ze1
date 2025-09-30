@@ -125,10 +125,10 @@ export default async function ScoresPage() {
                                         </TableCell>
                                         <TableCell className="text-right">
                                             <Button asChild variant="outline" size="sm">
-                                                <Link href={sub.fileUrl} target="_blank">
+                                                <a href={sub.fileUrl} download>
                                                     <Download className="mr-2 h-4 w-4" />
                                                     View File
-                                                </Link>
+                                                </a>
                                             </Button>
                                         </TableCell>
                                     </TableRow>
@@ -147,3 +147,5 @@ export default async function ScoresPage() {
     </div>
   );
 }
+
+    

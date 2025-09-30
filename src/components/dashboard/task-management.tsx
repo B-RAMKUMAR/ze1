@@ -157,8 +157,8 @@ export default function TaskManagement({
           toast({ title: "Task Updated", description: `"${title}" has been successfully updated.` });
           setEditDialogOpen(false);
       } else { // Creating
-          const newId = await createTaskAction(taskData);
-          setTasks(prevTasks => [...prevTasks, {...taskData, id: newId}]);
+          await createTaskAction(taskData);
+          setTasks(prevTasks => [...prevTasks, {...taskData, id: taskData.id}]);
           toast({ title: "Task Created", description: `"${title}" has been successfully published.` });
           setCreateDialogOpen(false);
       }
@@ -337,11 +337,11 @@ export default function TaskManagement({
                                 <TableCell>{sub.assigneeName}</TableCell>
                                 <TableCell>{format(new Date(sub.submittedAt), "PPpp")}</TableCell>
                                 <TableCell className="text-right">
-                                    <Button asChild variant="outline" size="sm">
-                                        <Link href={sub.fileUrl} target="_blank">
+                                     <Button asChild variant="outline" size="sm">
+                                        <a href={sub.fileUrl} download>
                                             <Download className="mr-2 h-4 w-4" />
                                             View File
-                                        </Link>
+                                        </a>
                                     </Button>
                                 </TableCell>
                             </TableRow>
@@ -439,3 +439,5 @@ export default function TaskManagement({
     </div>
   );
 }
+
+    
