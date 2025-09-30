@@ -16,6 +16,7 @@ import {
   LineChart,
   Trophy,
   Upload,
+  Edit,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -38,7 +39,7 @@ const navItems: NavItem[] = [
   { href: "/dashboard/scores", label: "My Scores", icon: Trophy, roles: ["Apprentice"] },
   
   // Scorer
-  { href: "/dashboard/submissions", label: "Submissions", icon: Award, roles: ["Scorer"] },
+  { href: "/dashboard/give-score", label: "Give Score", icon: Edit, roles: ["Scorer"] },
 
   // Program Operator
   { href: "/dashboard/orchestrator-tasks", label: "Tasks", icon: ClipboardCheck, roles: ["Program Operator"] },

@@ -49,7 +49,8 @@ export type Submission = {
     status: 'Pending Score' | 'Scored';
     fileUrl: string;
     scores?: ScoreBreakdown;
-    score?: number; // Legacy total score, can be deprecated
+    score?: number;
+    scorer?: string;
 };
 
 export type AccessRequest = {

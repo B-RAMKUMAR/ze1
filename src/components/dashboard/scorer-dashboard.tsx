@@ -17,7 +17,8 @@ import {
   import type { User, Submission } from "@/lib/types";
   import { Button } from "../ui/button";
   import { Badge } from "../ui/badge";
-  import { Download, Edit } from "lucide-react";
+  import { Download, Edit, ArrowRight } from "lucide-react";
+  import Link from "next/link";
   
   type ScorerDashboardProps = {
     user: User;
@@ -26,7 +27,7 @@ import {
   
   export default function ScorerDashboard({ user, submissions }: ScorerDashboardProps) {
     const pendingSubmissions = submissions.filter(s => s.status === 'Pending Score');
-    const scoredSubmissions = submissions.filter(s => s.status === 'Scored');
+    const scoredByYou = submissions.filter(s => s.status === 'Scored' && s.scorer === user.name);
     
     return (
       <div className="space-y-6">
@@ -40,11 +41,18 @@ import {
         </Card>
 
         <Card>
-            <CardHeader>
-                <CardTitle>Pending Submissions</CardTitle>
-                <CardDescription>
-                    These deliverables from apprentices are ready for scoring.
-                </CardDescription>
+            <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                    <CardTitle>Pending Submissions</CardTitle>
+                    <CardDescription>
+                        These deliverables are ready for scoring.
+                    </CardDescription>
+                </div>
+                 <Button asChild>
+                    <Link href="/dashboard/give-score">
+                        Go to Scoring Page <ArrowRight className="ml-2 h-4 w-4" />
+                    </Link>
+                </Button>
             </CardHeader>
             <CardContent>
                 <Table>
@@ -53,25 +61,14 @@ import {
                             <TableHead>Apprentice</TableHead>
                             <TableHead>Task</TableHead>
                             <TableHead>Submitted At</TableHead>
-                            <TableHead className="text-right">Actions</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {pendingSubmissions.length > 0 ? pendingSubmissions.map(sub => (
+                        {pendingSubmissions.length > 0 ? pendingSubmissions.slice(0, 5).map(sub => (
                              <TableRow key={sub.id}>
                                 <TableCell>{sub.assigneeName}</TableCell>
                                 <TableCell>{sub.taskTitle}</TableCell>
                                 <TableCell>{new Date(sub.submittedAt).toLocaleString()}</TableCell>
-                                <TableCell className="text-right space-x-2">
-                                    <Button variant="outline" size="sm">
-                                        <Download className="h-4 w-4 mr-2" />
-                                        Download
-                                    </Button>
-                                    <Button size="sm" className="bg-accent text-accent-foreground hover:bg-accent/90">
-                                        <Edit className="h-4 w-4 mr-2" />
-                                        Score
-                                    </Button>
-                                </TableCell>
                             </TableRow>
                         )) : (
                             <TableRow>
@@ -85,9 +82,9 @@ import {
 
         <Card>
             <CardHeader>
-                <CardTitle>Recently Scored</CardTitle>
+                <CardTitle>Recently Scored By You</CardTitle>
                 <CardDescription>
-                    A log of your recently scored submissions.
+                    A log of submissions you have recently scored.
                 </CardDescription>
             </CardHeader>
             <CardContent>
@@ -100,7 +97,7 @@ import {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {scoredSubmissions.length > 0 ? scoredSubmissions.map(sub => (
+                        {scoredByYou.length > 0 ? scoredByYou.slice(0, 5).map(sub => (
                             <TableRow key={sub.id}>
                                 <TableCell>{sub.assigneeName}</TableCell>
                                 <TableCell>{sub.taskTitle}</TableCell>
@@ -110,7 +107,7 @@ import {
                             </TableRow>
                         )) : (
                              <TableRow>
-                                <TableCell colSpan={3} className="text-center">No submissions have been scored yet.</TableCell>
+                                <TableCell colSpan={3} className="text-center">You have not scored any submissions yet.</TableCell>
                             </TableRow>
                         )}
                     </TableBody>
@@ -120,4 +117,3 @@ import {
       </div>
     );
   }
-  
