@@ -7,7 +7,7 @@ items:
     assigneeName: Ramkumar Balamurugan
     submittedAt: '2024-10-09T14:00:00Z'
     status: Scored
-    fileUrl: /mock-deliverable.zip
+    fileUrl: /mock-deliverable.txt
     scores:
       depth: 8
       relevance: 9
@@ -22,7 +22,7 @@ items:
     assigneeName: NagaSamrudh Meda
     submittedAt: '2024-10-14T11:23:00Z'
     status: Pending Score
-    fileUrl: /mock-deliverable.zip
+    fileUrl: /mock-deliverable.txt
   - id: 3
     taskId: 105
     taskTitle: Onboarding Documentation Review
@@ -30,7 +30,7 @@ items:
     assigneeName: NagaSamrudh Meda
     submittedAt: '2024-09-27T18:00:00Z'
     status: Scored
-    fileUrl: /mock-deliverable.zip
+    fileUrl: /mock-deliverable.txt
     scores:
       depth: 9
       relevance: 10
@@ -45,7 +45,7 @@ items:
     assigneeName: NagaSamrudh Meda
     submittedAt: '2024-10-08T11:00:00Z'
     status: Scored
-    fileUrl: /mock-deliverable.zip
+    fileUrl: /mock-deliverable.txt
     scores:
       depth: 7
       relevance: 8
@@ -60,6 +60,7 @@ items:
     assigneeName: Ramkumar Balamurugan
     submittedAt: '2025-09-30T06:59:36.721Z'
     status: Pending Score
-    fileUrl: /mock-deliverable.zip
+    fileUrl: /mock-deliverable.txt
 ---
+
 

@@ -58,7 +58,7 @@ export async function createSubmissionAction(input: CreateSubmissionInput): Prom
         assigneeName: input.assigneeName,
         submittedAt: new Date().toISOString(),
         status: "Pending Score",
-        fileUrl: "/mock-deliverable.zip", // Using a mock file URL as per the plan
+        fileUrl: "/mock-deliverable.txt", // Using a mock file URL as per the plan
     };
 
     // 3. Add new submission and write back to file
