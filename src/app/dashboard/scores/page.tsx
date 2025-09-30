@@ -102,6 +102,7 @@ export default async function ScoresPage() {
                             <TableHeader>
                                 <TableRow>
                                     <TableHead>Apprentice</TableHead>
+                                    <TableHead>Scorer</TableHead>
                                     <TableHead>Depth</TableHead>
                                     <TableHead>Relevance</TableHead>
                                     <TableHead>Applicability</TableHead>
@@ -115,6 +116,7 @@ export default async function ScoresPage() {
                                 {task.submissions.map(sub => (
                                     <TableRow key={sub.id}>
                                         <TableCell className="font-medium">{sub.assigneeName}</TableCell>
+                                        <TableCell>{sub.scorer}</TableCell>
                                         <TableCell>{sub.scores.depth}</TableCell>
                                         <TableCell>{sub.scores.relevance}</TableCell>
                                         <TableCell>{sub.scores.applicability}</TableCell>
@@ -147,5 +149,3 @@ export default async function ScoresPage() {
     </div>
   );
 }
-
-    

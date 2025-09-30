@@ -74,9 +74,10 @@ items:
     phase: D1
     objective: C1
     description: JBVJV
-    status: Submitted
+    status: Scored
     eta: '2025-10-01T18:30:00.000Z'
     assigneeId: 1
+    score: 74
   - id: 1759217952882
     title: D2
     phase: D2
@@ -98,9 +99,10 @@ items:
     phase: D43
     objective: DD
     description: DD
-    status: Submitted
+    status: Scored
     eta: '2025-10-02T18:30:00.000Z'
     submissionCount: 0
+    score: 50
   - id: 1759218734634
     title: EE
     phase: E

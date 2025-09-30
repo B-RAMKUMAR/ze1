@@ -67,8 +67,16 @@ items:
     assigneeId: 1
     assigneeName: Ramkumar Balamurugan
     submittedAt: '2025-09-30T06:59:36.721Z'
-    status: Pending Score
+    status: Scored
     fileUrl: /mock-deliverable.txt
+    scores:
+      depth: 7
+      relevance: 7
+      applicability: 9
+      novelty: 7
+      packaging: 7
+    score: 74
+    scorer: Srijanani S
   - id: 6
     taskId: 1759217952882
     taskTitle: D2
@@ -99,8 +107,16 @@ items:
     assigneeId: 1
     assigneeName: Ramkumar Balamurugan
     submittedAt: '2025-09-30T07:48:21.308Z'
-    status: Pending Score
+    status: Scored
     fileUrl: /mock-deliverable.txt
+    scores:
+      depth: 5
+      relevance: 5
+      applicability: 5
+      novelty: 5
+      packaging: 5
+    score: 50
+    scorer: Srijanani S
 ---
 
 
