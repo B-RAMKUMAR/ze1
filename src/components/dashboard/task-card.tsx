@@ -15,6 +15,7 @@ import { Progress } from "@/components/ui/progress";
 import { Clock, Upload } from "lucide-react";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 
 type Countdown = {
   days: number;
@@ -38,8 +39,10 @@ function calculateCountdown(eta: string): Countdown | null {
 
 export default function TaskCard({ task }: { task: Task }) {
   const [countdown, setCountdown] = useState<Countdown | null>(null);
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
+    setIsClient(true);
     setCountdown(calculateCountdown(task.eta));
     const timer = setInterval(() => {
       setCountdown(calculateCountdown(task.eta));
@@ -78,7 +81,7 @@ export default function TaskCard({ task }: { task: Task }) {
       </CardHeader>
       <CardContent>
         <p className="text-sm text-muted-foreground mb-4">{task.description}</p>
-        {countdown ? (
+        {isClient && countdown ? (
             <div className="flex items-center gap-2 text-sm">
                 <Clock className="h-4 w-4" />
                 <span>
@@ -88,7 +91,7 @@ export default function TaskCard({ task }: { task: Task }) {
         ) : (
              <div className="flex items-center gap-2 text-sm text-destructive">
                 <Clock className="h-4 w-4" />
-                <span>Deadline passed</span>
+                <span>{isClient ? 'Deadline passed' : 'Calculating...'}</span>
             </div>
         )}
       </CardContent>
@@ -100,9 +103,11 @@ export default function TaskCard({ task }: { task: Task }) {
              </div>
         ) : <div />}
         {isActionable && (
-            <Button>
-                <Upload className="mr-2 h-4 w-4" />
-                Submit Deliverable
+            <Button asChild>
+                <Link href="/dashboard/submissions">
+                    <Upload className="mr-2 h-4 w-4" />
+                    Submit Deliverable
+                </Link>
             </Button>
         )}
       </CardFooter>

@@ -38,6 +38,7 @@ function calculateCountdown(eta: string): Countdown | null {
 
 export default function SubmissionForm({ task, user, initialSubmission, isDeadlinePassed }: { task: Task; user: User, initialSubmission?: Submission, isDeadlinePassed: boolean }) {
   const [countdown, setCountdown] = useState<Countdown | null>(null);
+  const [isClient, setIsClient] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [isSubmitted, setIsSubmitted] = useState(!!initialSubmission);
   const [isEditing, setIsEditing] = useState(!initialSubmission);
@@ -47,6 +48,7 @@ export default function SubmissionForm({ task, user, initialSubmission, isDeadli
   const { toast } = useToast();
 
    useEffect(() => {
+    setIsClient(true);
     setCountdown(calculateCountdown(task.eta));
     const timer = setInterval(() => {
       setCountdown(calculateCountdown(task.eta));
@@ -86,7 +88,6 @@ export default function SubmissionForm({ task, user, initialSubmission, isDeadli
             setIsSubmitted(true);
             setIsEditing(false);
             setSelectedFile(null);
-            // You might need to reload or re-fetch data to get the updated initialSubmission
         } else {
              toast({
               variant: "destructive",
@@ -115,7 +116,7 @@ export default function SubmissionForm({ task, user, initialSubmission, isDeadli
             <CardDescription>{task.objective}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-             {countdown ? (
+             {isClient && countdown ? (
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <Clock className="h-4 w-4" />
                     <span>
@@ -125,7 +126,7 @@ export default function SubmissionForm({ task, user, initialSubmission, isDeadli
             ) : (
                 <div className="flex items-center gap-2 text-sm text-destructive font-medium">
                     <Clock className="h-4 w-4" />
-                    <span>Deadline has passed.</span>
+                    <span>{isClient ? 'Deadline has passed.' : 'Calculating...'}</span>
                 </div>
             )}
             
