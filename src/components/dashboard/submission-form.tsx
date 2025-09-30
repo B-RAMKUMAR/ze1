@@ -9,10 +9,11 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { useState, useEffect, useTransition } from "react";
-import { Clock, Upload, Loader2, CheckCircle } from "lucide-react";
+import { useState, useEffect, useTransition, useRef } from "react";
+import { Clock, Upload, Loader2, CheckCircle, File as FileIcon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { createSubmissionAction } from "@/lib/submission-actions";
+import { Input } from "../ui/input";
 
 type Countdown = {
   days: number;
@@ -40,6 +41,8 @@ export default function SubmissionForm({ task, user }: { task: Task; user: User 
   );
   const [isPending, startTransition] = useTransition();
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -50,7 +53,22 @@ export default function SubmissionForm({ task, user }: { task: Task; user: User 
     return () => clearInterval(timer);
   }, [task.eta]);
 
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files) {
+      setSelectedFile(event.target.files[0]);
+    }
+  };
+
   const handleSubmit = async () => {
+    if (!selectedFile) {
+      toast({
+        variant: "destructive",
+        title: "No File Selected",
+        description: "Please choose a file to submit.",
+      });
+      return;
+    }
+
     startTransition(async () => {
       try {
         await createSubmissionAction({
@@ -108,20 +126,27 @@ export default function SubmissionForm({ task, user }: { task: Task; user: User 
                     </span>
                 </div>
             )}
-            <div className="flex items-center gap-4">
-                <p className="text-sm text-muted-foreground">This action will mark your task as submitted. The actual file upload is simulated.</p>
-                <Button onClick={handleSubmit} disabled={isPending}>
+             <div className="flex flex-col sm:flex-row items-center gap-4">
+                <Input type="file" ref={fileInputRef} onChange={handleFileChange} className="max-w-xs"/>
+                <Button onClick={handleSubmit} disabled={isPending || !selectedFile} className="w-full sm:w-auto">
                     {isPending ? (
                         <>
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Submitting...
                         </>
                     ) : (
                         <>
-                            <Upload className="mr-2 h-4 w-4" /> Mark as Submitted
+                            <Upload className="mr-2 h-4 w-4" /> Submit Deliverable
                         </>
                     )}
                 </Button>
             </div>
+             {selectedFile && (
+                <div className="flex items-center gap-2 text-sm text-muted-foreground border rounded-lg p-2 bg-background">
+                    <FileIcon className="h-4 w-4" />
+                    <span className="font-medium">Selected:</span>
+                    <span>{selectedFile.name}</span>
+                </div>
+            )}
         </CardContent>
     </Card>
   )
