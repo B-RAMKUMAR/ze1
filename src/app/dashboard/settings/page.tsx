@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Card,
   CardContent,
@@ -16,8 +18,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Settings, Bell, Palette } from "lucide-react";
+import { useTheme } from "next-themes";
 
 export default function SettingsPage() {
+  const { setTheme, theme } = useTheme();
+
   return (
     <div className="space-y-6">
         <Card>
@@ -46,7 +51,7 @@ export default function SettingsPage() {
                 Select your preferred color scheme.
               </p>
             </div>
-            <Select defaultValue="system">
+            <Select onValueChange={setTheme} defaultValue={theme}>
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Select theme" />
               </SelectTrigger>
@@ -93,7 +98,7 @@ export default function SettingsPage() {
       </Card>
 
        <div className="flex justify-end">
-            <Button>Save Preferences</Button>
+            <Button disabled>Save Preferences</Button>
        </div>
     </div>
   );
