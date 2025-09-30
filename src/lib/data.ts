@@ -37,8 +37,6 @@ export async function getTasks(): Promise<Task[]> {
 
 export async function getTasksForUser(userId: number): Promise<Task[]> {
   const tasks = await getTasks();
-  // Since tasks are not assigned, return all tasks for now.
-  // In a real app, you might have a linking table or different logic.
   return tasks;
 }
 

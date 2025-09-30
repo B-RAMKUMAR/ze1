@@ -55,9 +55,9 @@ export type Submission = {
 
 export type AccessRequest = {
     id: number;
-    userId: number;
     userName: string;
     userEmail: string;
+    userRole: string;
     requestedAt: string;
-    status: 'Pending' | 'Approved';
+    status: 'Pending' | 'Approved' | 'Rejected';
 };

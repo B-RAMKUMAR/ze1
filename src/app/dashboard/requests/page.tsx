@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Card,
   CardContent,
@@ -15,14 +17,55 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { getAccessRequests } from "@/lib/data";
-import { History, Check, X } from "lucide-react";
+import { History, Check, X, Loader2 } from "lucide-react";
 import { format } from "date-fns";
+import type { AccessRequest } from "@/lib/types";
+import { useState, useTransition, useEffect } from "react";
+import { getAccessRequests, approveAccessRequest, rejectAccessRequest } from "@/lib/request-actions";
+import { useToast } from "@/hooks/use-toast";
 
-export default async function RequestsPage() {
-  const allRequests = await getAccessRequests();
+
+export default function RequestsPage() {
+  const [allRequests, setAllRequests] = useState<AccessRequest[]>([]);
+  const [isPending, startTransition] = useTransition();
+  const { toast } = useToast();
+
+  useEffect(() => {
+    const fetchRequests = async () => {
+      const requests = await getAccessRequests();
+      setAllRequests(requests);
+    };
+    fetchRequests();
+  }, []);
+
+  const handleApprove = async (requestId: number, userName: string) => {
+    startTransition(async () => {
+      const result = await approveAccessRequest(requestId);
+      if (result.success) {
+        toast({ title: "Request Approved", description: `${userName} has been granted access and a user account has been created.` });
+        const requests = await getAccessRequests();
+        setAllRequests(requests);
+      } else {
+        toast({ variant: "destructive", title: "Approval Failed", description: result.error });
+      }
+    });
+  };
+  
+  const handleReject = async (requestId: number, userName: string) => {
+     startTransition(async () => {
+      const result = await rejectAccessRequest(requestId);
+      if (result.success) {
+        toast({ title: "Request Rejected", description: `The request from ${userName} has been rejected.` });
+        const requests = await getAccessRequests();
+        setAllRequests(requests);
+      } else {
+        toast({ variant: "destructive", title: "Rejection Failed", description: result.error });
+      }
+    });
+  };
+
   const pendingRequests = allRequests.filter(r => r.status === 'Pending');
-  const approvedRequests = allRequests.filter(r => r.status === 'Approved');
+  const processedRequests = allRequests.filter(r => r.status !== 'Pending');
 
   return (
     <div className="space-y-6">
@@ -59,13 +102,11 @@ export default async function RequestsPage() {
                     <TableCell>{req.userEmail}</TableCell>
                     <TableCell>{format(new Date(req.requestedAt), "PP")}</TableCell>
                     <TableCell className="text-right space-x-2">
-                      <Button variant="outline" size="sm">
-                        <X className="mr-2 h-4 w-4" />
-                        Reject
+                      <Button variant="outline" size="sm" onClick={() => handleReject(req.id, req.userName)} disabled={isPending}>
+                         {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <><X className="mr-2 h-4 w-4" /> Reject</>}
                       </Button>
-                      <Button size="sm">
-                        <Check className="mr-2 h-4 w-4" />
-                        Approve
+                      <Button size="sm" onClick={() => handleApprove(req.id, req.userName)} disabled={isPending}>
+                        {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Check className="mr-2 h-4 w-4" /> Approve</>}
                       </Button>
                     </TableCell>
                   </TableRow>
@@ -85,7 +126,7 @@ export default async function RequestsPage() {
       <Card>
         <CardHeader>
             <CardTitle>Request History</CardTitle>
-            <CardDescription>A log of all previously approved access requests.</CardDescription>
+            <CardDescription>A log of all previously approved or rejected access requests.</CardDescription>
         </CardHeader>
         <CardContent>
             <Table>
@@ -97,19 +138,19 @@ export default async function RequestsPage() {
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {approvedRequests.length > 0 ? (
-                        approvedRequests.map(req => (
+                    {processedRequests.length > 0 ? (
+                        processedRequests.map(req => (
                             <TableRow key={req.id}>
                                 <TableCell>{req.userName}</TableCell>
                                 <TableCell>{req.userEmail}</TableCell>
                                 <TableCell>
-                                    <Badge variant="secondary">{req.status}</Badge>
+                                    <Badge variant={req.status === 'Approved' ? "secondary" : "destructive"}>{req.status}</Badge>
                                 </TableCell>
                             </TableRow>
                         ))
                     ) : (
                         <TableRow>
-                            <TableCell colSpan={3} className="text-center">No approved requests yet.</TableCell>
+                            <TableCell colSpan={3} className="text-center">No processed requests yet.</TableCell>
                         </TableRow>
                     )}
                 </TableBody>
