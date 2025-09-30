@@ -41,6 +41,7 @@ const navItems: NavItem[] = [
   { href: "/dashboard/submissions", label: "Submissions", icon: Award, roles: ["Scorer"] },
 
   // Program Operator
+  { href: "/dashboard/orchestrator-tasks", label: "Tasks", icon: ClipboardCheck, roles: ["Program Operator"] },
   { href: "/dashboard/announcements", label: "Announcements", icon: Megaphone, roles: ["Program Operator"] },
   { href: "/dashboard/people", label: "People Directory", icon: Users, roles: ["Program Operator"] },
   
