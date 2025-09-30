@@ -81,8 +81,12 @@ export default async function DashboardLayout({
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>My Account ({user.role})</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>Profile</DropdownMenuItem>
-              <DropdownMenuItem>Settings</DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/dashboard/profile">Profile</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/dashboard/settings">Settings</Link>
+              </DropdownMenuItem>
               <DropdownMenuSeparator />
                <form action={logout}>
                   <Button type="submit" variant="ghost" className="w-full justify-start px-2 py-1.5 text-sm">Logout</Button>
