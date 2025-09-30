@@ -129,7 +129,7 @@ title: "Links"
 ## Important Links
 | Category | Tools |
 | :--- | :--- |
-| Learn | muLearn: https://mulearn.mu-sigma.com/ |
-| | EoC: https://eoc.mu-sigma.com/search/content |
-| Diary | muWiki: https://wiki.mu-sigma.com/muwiki/index.php/2025_Training_Program |
-| Git | muGitlab: https://mugitlab.mu-sigma.com/2025_training_program |
+| Learn | [muLearn](https://mulearn.mu-sigma.com/) |
+| | [EoC](https://eoc.mu-sigma.com/search/content) |
+| Diary | [muWiki](https://wiki.mu-sigma.com/muwiki/index.php/2025_Training_Program) |
+| Git | [muGitlab](https://mugitlab.mu-sigma.com/2025_training_program) |
