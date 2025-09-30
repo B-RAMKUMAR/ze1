@@ -20,6 +20,16 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -31,10 +41,48 @@ import {
 } from "@/components/ui/select";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { UserPlus, Trash2 } from "lucide-react";
+import { UserPlus, Trash2, Loader2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { deleteUserAction } from "@/lib/auth";
 
-export default function PeopleManagement({ users }: { users: User[] }) {
+
+export default function PeopleManagement({ users: initialUsers }: { users: User[] }) {
+  const [users, setUsers] = useState<User[]>(initialUsers);
   const [open, setOpen] = useState(false);
+  const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [isPending, setIsPending] = useState(false);
+  const { toast } = useToast();
+
+  const handleDeleteTrigger = (user: User) => {
+    setSelectedUser(user);
+    setDeleteDialogOpen(true);
+  };
+  
+  const handleDeleteConfirm = async () => {
+    if (!selectedUser) return;
+
+    setIsPending(true);
+    try {
+      await deleteUserAction(selectedUser.id);
+      setUsers(users.filter(u => u.id !== selectedUser.id));
+      toast({
+        title: "User Removed",
+        description: `${selectedUser.name} has been removed from the system.`,
+      });
+    } catch (error) {
+       toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to remove user. Please try again.",
+      });
+    } finally {
+      setIsPending(false);
+      setDeleteDialogOpen(false);
+      setSelectedUser(null);
+    }
+  };
+
 
   return (
     <div className="space-y-4">
@@ -97,6 +145,22 @@ export default function PeopleManagement({ users }: { users: User[] }) {
           </DialogContent>
         </Dialog>
       </div>
+       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently remove {selectedUser?.name} and all their associated data.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setSelectedUser(null)}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteConfirm} disabled={isPending}>
+              {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Continue"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
       <Table>
         <TableHeader>
           <TableRow>
@@ -121,7 +185,7 @@ export default function PeopleManagement({ users }: { users: User[] }) {
                 <Badge variant="outline">{user.role}</Badge>
               </TableCell>
               <TableCell className="text-right">
-                <Button variant="destructive" size="icon">
+                <Button variant="destructive" size="icon" onClick={() => handleDeleteTrigger(user)} disabled={user.role === 'Program Orchestrator'}>
                   <Trash2 className="h-4 w-4" />
                   <span className="sr-only">Remove User</span>
                 </Button>

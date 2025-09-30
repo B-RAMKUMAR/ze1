@@ -7,6 +7,8 @@ import fs from "fs/promises";
 import path from "path";
 import matter from "gray-matter";
 import { z } from "zod";
+import { revalidatePath } from "next/cache";
+
 
 const contentDirectory = path.join(process.cwd(), "samplemd");
 const usersFilePath = path.join(contentDirectory, "users.md");
@@ -110,4 +112,28 @@ export async function updateUserPassword(email: string, password: string): Promi
     console.error("Error updating password:", error);
     return { success: false, error: "An unexpected server error occurred." };
   }
+}
+
+export async function deleteUserAction(userId: number): Promise<{ success: boolean; error?: string }> {
+    try {
+        const { data, content } = await readUsersFile();
+        let users = data.items || [];
+        
+        const initialLength = users.length;
+        users = users.filter(u => u.id !== userId);
+
+        if (users.length === initialLength) {
+            return { success: false, error: "User not found." };
+        }
+
+        await writeUsersFile(users, content);
+        
+        revalidatePath("/dashboard/people");
+        revalidatePath("/dashboard");
+
+        return { success: true };
+    } catch (error) {
+        console.error("Error deleting user:", error);
+        return { success: false, error: "An unexpected server error occurred." };
+    }
 }
