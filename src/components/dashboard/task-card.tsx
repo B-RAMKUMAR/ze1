@@ -37,11 +37,10 @@ function calculateCountdown(eta: string): Countdown | null {
 }
 
 export default function TaskCard({ task }: { task: Task }) {
-  const [countdown, setCountdown] = useState<Countdown | null>(() =>
-    calculateCountdown(task.eta)
-  );
+  const [countdown, setCountdown] = useState<Countdown | null>(null);
 
   useEffect(() => {
+    setCountdown(calculateCountdown(task.eta));
     const timer = setInterval(() => {
       setCountdown(calculateCountdown(task.eta));
     }, 1000);

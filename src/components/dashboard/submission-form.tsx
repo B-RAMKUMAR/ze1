@@ -37,9 +37,7 @@ function calculateCountdown(eta: string): Countdown | null {
 }
 
 export default function SubmissionForm({ task, user, initialSubmission, isDeadlinePassed }: { task: Task; user: User, initialSubmission?: Submission, isDeadlinePassed: boolean }) {
-  const [countdown, setCountdown] = useState<Countdown | null>(() =>
-    calculateCountdown(task.eta)
-  );
+  const [countdown, setCountdown] = useState<Countdown | null>(null);
   const [isPending, startTransition] = useTransition();
   const [isSubmitted, setIsSubmitted] = useState(!!initialSubmission);
   const [isEditing, setIsEditing] = useState(!initialSubmission);
@@ -48,7 +46,8 @@ export default function SubmissionForm({ task, user, initialSubmission, isDeadli
   const formRef = useRef<HTMLFormElement>(null);
   const { toast } = useToast();
 
-  useEffect(() => {
+   useEffect(() => {
+    setCountdown(calculateCountdown(task.eta));
     const timer = setInterval(() => {
       setCountdown(calculateCountdown(task.eta));
     }, 1000);
