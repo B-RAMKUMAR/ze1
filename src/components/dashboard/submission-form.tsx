@@ -1,6 +1,6 @@
 "use client";
 
-import type { Task, User } from "@/lib/types";
+import type { Task, User, Submission } from "@/lib/types";
 import {
   Card,
   CardContent,
@@ -10,10 +10,11 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect, useTransition, useRef } from "react";
-import { Clock, Upload, Loader2, CheckCircle, File as FileIcon } from "lucide-react";
+import { Clock, Upload, Loader2, CheckCircle, File as FileIcon, Edit } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { createSubmissionAction } from "@/lib/submission-actions";
 import { Input } from "../ui/input";
+import { format } from "date-fns";
 
 type Countdown = {
   days: number;
@@ -35,12 +36,13 @@ function calculateCountdown(eta: string): Countdown | null {
   return null;
 }
 
-export default function SubmissionForm({ task, user }: { task: Task; user: User }) {
+export default function SubmissionForm({ task, user, initialSubmission, isDeadlinePassed }: { task: Task; user: User, initialSubmission?: Submission, isDeadlinePassed: boolean }) {
   const [countdown, setCountdown] = useState<Countdown | null>(() =>
     calculateCountdown(task.eta)
   );
   const [isPending, startTransition] = useTransition();
-  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(!!initialSubmission);
+  const [isEditing, setIsEditing] = useState(!initialSubmission);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
@@ -72,6 +74,7 @@ export default function SubmissionForm({ task, user }: { task: Task; user: User 
     startTransition(async () => {
       try {
         await createSubmissionAction({
+          submissionId: initialSubmission?.id,
           taskId: task.id,
           taskTitle: task.title,
           assigneeId: user.id,
@@ -79,10 +82,11 @@ export default function SubmissionForm({ task, user }: { task: Task; user: User 
         });
 
         toast({
-          title: "Submission Successful!",
+          title: `Submission ${initialSubmission ? 'Updated' : 'Successful'}!`,
           description: `Your deliverable for "${task.title}" has been submitted.`,
         });
         setIsSubmitted(true);
+        setIsEditing(false);
       } catch (error) {
         console.error(error);
         toast({
@@ -94,58 +98,69 @@ export default function SubmissionForm({ task, user }: { task: Task; user: User 
     });
   };
   
-  if (isSubmitted) {
-    return (
-        <Card className="bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800">
-            <CardHeader>
-                <CardTitle>{task.title}</CardTitle>
-                <CardDescription>{task.objective}</CardDescription>
-            </CardHeader>
-            <CardContent>
-                <div className="flex items-center gap-2 text-green-600 dark:text-green-400">
-                    <CheckCircle className="h-5 w-5" />
-                    <p className="font-semibold">Successfully Submitted</p>
-                </div>
-            </CardContent>
-        </Card>
-    )
-  }
+  const cardBg = isSubmitted ? "bg-green-50 dark:bg-green-900/20" : "bg-muted/50";
+  const cardBorder = isSubmitted ? "border-green-200 dark:border-green-800" : "";
 
   return (
-    <Card className="bg-muted/50">
+    <Card className={`${cardBg} ${cardBorder}`}>
         <CardHeader>
             <CardTitle>{task.title}</CardTitle>
             <CardDescription>{task.objective}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-             {countdown && (
+             {countdown ? (
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <Clock className="h-4 w-4" />
                     <span>
                         Time left: {countdown.days}d {countdown.hours}h {countdown.minutes}m {countdown.seconds}s
                     </span>
                 </div>
-            )}
-             <div className="flex flex-col sm:flex-row items-center gap-4">
-                <Input type="file" ref={fileInputRef} onChange={handleFileChange} className="max-w-xs"/>
-                <Button onClick={handleSubmit} disabled={isPending || !selectedFile} className="w-full sm:w-auto">
-                    {isPending ? (
-                        <>
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Submitting...
-                        </>
-                    ) : (
-                        <>
-                            <Upload className="mr-2 h-4 w-4" /> Submit Deliverable
-                        </>
-                    )}
-                </Button>
-            </div>
-             {selectedFile && (
-                <div className="flex items-center gap-2 text-sm text-muted-foreground border rounded-lg p-2 bg-background">
-                    <FileIcon className="h-4 w-4" />
-                    <span className="font-medium">Selected:</span>
-                    <span>{selectedFile.name}</span>
+            ) : (
+                <div className="flex items-center gap-2 text-sm text-destructive font-medium">
+                    <Clock className="h-4 w-4" />
+                    <span>Deadline has passed.</span>
                 </div>
+            )}
+            
+            {isEditing && !isDeadlinePassed && (
+              <>
+                <div className="flex flex-col sm:flex-row items-center gap-4">
+                    <Input type="file" ref={fileInputRef} onChange={handleFileChange} className="max-w-xs"/>
+                    <Button onClick={handleSubmit} disabled={isPending || !selectedFile} className="w-full sm:w-auto">
+                        {isPending ? (
+                            <>
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Submitting...
+                            </>
+                        ) : (
+                            <>
+                                <Upload className="mr-2 h-4 w-4" /> {initialSubmission ? 'Update Deliverable' : 'Submit Deliverable'}
+                            </>
+                        )}
+                    </Button>
+                </div>
+                {selectedFile && (
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground border rounded-lg p-2 bg-background">
+                        <FileIcon className="h-4 w-4" />
+                        <span className="font-medium">Selected:</span>
+                        <span>{selectedFile.name}</span>
+                    </div>
+                )}
+              </>
+            )}
+            
+            {isSubmitted && !isEditing && (
+                 <div className="space-y-3">
+                    <div className="flex items-center gap-2 text-green-600 dark:text-green-400">
+                        <CheckCircle className="h-5 w-5" />
+                        <p className="font-semibold">Successfully Submitted on {format(new Date(initialSubmission?.submittedAt || Date.now()), "PPpp")}</p>
+                    </div>
+                     {!isDeadlinePassed && (
+                        <Button variant="outline" size="sm" onClick={() => setIsEditing(true)}>
+                            <Edit className="mr-2 h-4 w-4" />
+                            Edit Submission
+                        </Button>
+                    )}
+                 </div>
             )}
         </CardContent>
     </Card>

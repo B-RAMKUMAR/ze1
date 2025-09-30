@@ -90,7 +90,7 @@ items:
     phase: D4
     objective: D4D4
     description: D4
-    status: In Progress
+    status: Submitted
     eta: '2025-10-01T18:30:00.000Z'
     submissionCount: 0
 ---
