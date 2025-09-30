@@ -44,25 +44,44 @@ const navItems: NavItem[] = [
   { href: "/dashboard/orchestrator-tasks", label: "Tasks", icon: ClipboardCheck, roles: ["Program Operator"] },
   { href: "/dashboard/announcements", label: "Announcements", icon: Megaphone, roles: ["Program Operator"] },
   { href: "/dashboard/people", label: "People Directory", icon: Users, roles: ["Program Operator"] },
+  { href: "/dashboard/scores", label: "Scores & Leaderboard", icon: Trophy, roles: ["Program Operator", "Program Orchestrator"] },
   
   // Program Orchestrator
   { href: "/dashboard/analytical", label: "Program Analytics", icon: LineChart, roles: ["Program Orchestrator"] },
   { href: "/dashboard/orchestrator-tasks", label: "Task Management", icon: ClipboardCheck, roles: ["Program Orchestrator"] },
   { href: "/dashboard/people", label: "People Management", icon: Users, roles: ["Program Orchestrator"] },
   { href: "/dashboard/orchestrator-announcements", label: "Post Announcement", icon: Megaphone, roles: ["Program Orchestrator"] },
-  { href: "/dashboard/scores", label: "Scores & Leaderboard", icon: Trophy, roles: ["Program Orchestrator"] },
   { href: "/dashboard/requests", label: "Access Requests", icon: History, roles: ["Program Orchestrator"] },
 ];
 
 export default function SidebarNav({ userRole }: { userRole: UserRole }) {
+  const accessibleNavItems = navItems.filter(item => {
+    if (!item.roles.includes(userRole)) return false;
+
+    // Special rule for Orchestrator: show "Task Management" instead of "Tasks"
+    if (userRole === 'Program Orchestrator' && item.href === '/dashboard/orchestrator-tasks' && item.label === 'Tasks') return false;
+    if (userRole === 'Program Operator' && item.href === '/dashboard/orchestrator-tasks' && item.label === 'Task Management') return false;
+    
+    // Special rule for Orchestrator: show "People Management" instead of "People Directory"
+    if (userRole === 'Program Orchestrator' && item.href === '/dashboard/people' && item.label === 'People Directory') return false;
+    if (userRole === 'Program Operator' && item.href === '/dashboard/people' && item.label === 'People Management') return false;
+
+     // Special rule for Orchestrator: show "Post Announcement" instead of "Announcements"
+    if (userRole === 'Program Orchestrator' && item.href === '/dashboard/orchestrator-announcements') return true;
+    if (userRole === 'Program Operator' && item.href === '/dashboard/orchestrator-announcements') return false;
+    if (userRole === 'Program Operator' && item.href === '/dashboard/announcements') return true;
+
+
+    return true;
+  });
+
   const pathname = usePathname();
-  const accessibleNavItems = navItems.filter(item => item.roles.includes(userRole));
 
   return (
     <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
       {accessibleNavItems.map((item) => (
         <Link
-          key={item.href}
+          key={item.href + item.label}
           href={item.href}
           className={cn(
             "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary",
