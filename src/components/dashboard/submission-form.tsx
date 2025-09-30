@@ -9,9 +9,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { useState, useEffect, useTransition } from "react";
-import { Clock, Upload, Loader2 } from "lucide-react";
+import { Clock, Upload, Loader2, CheckCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { createSubmissionAction } from "@/lib/submission-actions";
 
@@ -78,7 +77,20 @@ export default function SubmissionForm({ task, user }: { task: Task; user: User 
   };
   
   if (isSubmitted) {
-    return null;
+    return (
+        <Card className="bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800">
+            <CardHeader>
+                <CardTitle>{task.title}</CardTitle>
+                <CardDescription>{task.objective}</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <div className="flex items-center gap-2 text-green-600 dark:text-green-400">
+                    <CheckCircle className="h-5 w-5" />
+                    <p className="font-semibold">Successfully Submitted</p>
+                </div>
+            </CardContent>
+        </Card>
+    )
   }
 
   return (
@@ -97,7 +109,7 @@ export default function SubmissionForm({ task, user }: { task: Task; user: User 
                 </div>
             )}
             <div className="flex items-center gap-4">
-                <Input type="file" className="max-w-xs" />
+                <p className="text-sm text-muted-foreground">This action will mark your task as submitted. The actual file upload is simulated.</p>
                 <Button onClick={handleSubmit} disabled={isPending}>
                     {isPending ? (
                         <>
@@ -105,7 +117,7 @@ export default function SubmissionForm({ task, user }: { task: Task; user: User 
                         </>
                     ) : (
                         <>
-                            <Upload className="mr-2 h-4 w-4" /> Submit
+                            <Upload className="mr-2 h-4 w-4" /> Mark as Submitted
                         </>
                     )}
                 </Button>
