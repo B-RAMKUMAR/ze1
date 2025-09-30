@@ -21,6 +21,7 @@ export type Task = {
   assigneeId: number;
   description: string;
   score?: number;
+  submissionCount?: number;
 };
 
 export type Announcement = {

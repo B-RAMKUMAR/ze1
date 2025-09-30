@@ -1,6 +1,6 @@
 "use client";
 
-import type { Task } from "@/lib/types";
+import type { Task, User } from "@/lib/types";
 import {
   Card,
   CardContent,
@@ -10,8 +10,10 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useState, useEffect } from "react";
-import { Clock, Upload } from "lucide-react";
+import { useState, useEffect, useTransition } from "react";
+import { Clock, Upload, Loader2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { createSubmissionAction } from "@/lib/submission-actions";
 
 type Countdown = {
   days: number;
@@ -33,11 +35,13 @@ function calculateCountdown(eta: string): Countdown | null {
   return null;
 }
 
-
-export default function SubmissionForm({ task }: { task: Task }) {
+export default function SubmissionForm({ task, user }: { task: Task; user: User }) {
   const [countdown, setCountdown] = useState<Countdown | null>(() =>
     calculateCountdown(task.eta)
   );
+  const [isPending, startTransition] = useTransition();
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -46,6 +50,36 @@ export default function SubmissionForm({ task }: { task: Task }) {
 
     return () => clearInterval(timer);
   }, [task.eta]);
+
+  const handleSubmit = async () => {
+    startTransition(async () => {
+      try {
+        await createSubmissionAction({
+          taskId: task.id,
+          taskTitle: task.title,
+          assigneeId: user.id,
+          assigneeName: user.name,
+        });
+
+        toast({
+          title: "Submission Successful!",
+          description: `Your deliverable for "${task.title}" has been submitted.`,
+        });
+        setIsSubmitted(true);
+      } catch (error) {
+        console.error(error);
+        toast({
+          variant: "destructive",
+          title: "Submission Failed",
+          description: "There was an error submitting your deliverable. Please try again.",
+        });
+      }
+    });
+  };
+  
+  if (isSubmitted) {
+    return null;
+  }
 
   return (
     <Card className="bg-muted/50">
@@ -64,9 +98,16 @@ export default function SubmissionForm({ task }: { task: Task }) {
             )}
             <div className="flex items-center gap-4">
                 <Input type="file" className="max-w-xs" />
-                <Button>
-                    <Upload className="mr-2 h-4 w-4" />
-                    Submit
+                <Button onClick={handleSubmit} disabled={isPending}>
+                    {isPending ? (
+                        <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Submitting...
+                        </>
+                    ) : (
+                        <>
+                            <Upload className="mr-2 h-4 w-4" /> Submit
+                        </>
+                    )}
                 </Button>
             </div>
         </CardContent>

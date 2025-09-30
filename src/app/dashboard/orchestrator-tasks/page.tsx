@@ -5,12 +5,21 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import { getTasks } from "@/lib/data";
+import { getTasks, getSubmissions, getUsers } from "@/lib/data";
 import { ClipboardCheck } from "lucide-react";
 import TaskManagement from "@/components/dashboard/task-management";
 
 export default async function OrchestratorTasksPage() {
   const tasks = await getTasks();
+  const submissions = await getSubmissions();
+  const users = await getUsers();
+
+  const tasksWithSubmissionCounts = tasks.map(task => ({
+    ...task,
+    submissionCount: submissions.filter(s => s.taskId === task.id).length,
+  }));
+
+  const apprentices = users.filter(u => u.role === 'Apprentice');
 
   return (
     <Card>
@@ -26,7 +35,11 @@ export default async function OrchestratorTasksPage() {
         </div>
       </CardHeader>
       <CardContent>
-        <TaskManagement initialTasks={tasks} />
+        <TaskManagement 
+          initialTasks={tasksWithSubmissionCounts} 
+          allSubmissions={submissions}
+          apprentices={apprentices}
+        />
       </CardContent>
     </Card>
   );

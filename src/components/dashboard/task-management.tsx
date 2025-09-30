@@ -1,8 +1,7 @@
-
 "use client";
 
 import { useState } from "react";
-import type { Task } from "@/lib/types";
+import type { Task, Submission, User } from "@/lib/types";
 import {
   Table,
   TableBody,
@@ -13,6 +12,12 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Dialog,
   DialogContent,
@@ -31,7 +36,6 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -49,16 +53,27 @@ import {
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { Textarea } from "@/components/ui/textarea";
-import { PlusCircle, Edit, Trash2, CalendarIcon, Loader2 } from "lucide-react";
+import { PlusCircle, MoreHorizontal, Download, Edit, Trash2, CalendarIcon, Loader2, View } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { createTaskAction, updateTaskAction, deleteTaskAction } from "@/lib/task-actions";
 import { useToast } from "@/hooks/use-toast";
+import Link from "next/link";
 
-export default function TaskManagement({ initialTasks }: { initialTasks: Task[] }) {
+export default function TaskManagement({ 
+  initialTasks,
+  allSubmissions,
+  apprentices
+}: { 
+  initialTasks: Task[];
+  allSubmissions: Submission[];
+  apprentices: User[];
+}) {
   const [tasks, setTasks] = useState<Task[]>(initialTasks);
   const [isCreateDialogOpen, setCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setEditDialogOpen] = useState(false);
+  const [isSubmissionsOpen, setSubmissionsOpen] = useState(false);
+  const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isPending, setIsPending] = useState(false);
 
   const { toast } = useToast();
@@ -71,6 +86,7 @@ export default function TaskManagement({ initialTasks }: { initialTasks: Task[] 
   const [objective, setObjective] = useState("");
   const [status, setStatus] = useState<Task["status"]>("Not Started");
   const [eta, setEta] = useState<Date>();
+  const [assigneeId, setAssigneeId] = useState<number>(1);
 
   const resetForm = () => {
     setTitle("");
@@ -80,6 +96,7 @@ export default function TaskManagement({ initialTasks }: { initialTasks: Task[] 
     setStatus("Not Started");
     setEta(undefined);
     setSelectedTask(null);
+    setAssigneeId(1);
   };
 
   const handleCreateClick = () => {
@@ -92,18 +109,25 @@ export default function TaskManagement({ initialTasks }: { initialTasks: Task[] 
     setTitle(task.title);
     setPhase(task.phase);
     setDescription(task.description);
-    setObjective(task.objective)
+    setObjective(task.objective);
     setStatus(task.status);
     setEta(new Date(task.eta));
+    setAssigneeId(task.assigneeId);
     setEditDialogOpen(true);
   };
   
-  const handleDeleteClick = (task: Task) => {
+  const handleDeleteTrigger = (task: Task) => {
     setSelectedTask(task);
+    setDeleteDialogOpen(true);
+  };
+  
+  const handleViewSubmissions = (task: Task) => {
+    setSelectedTask(task);
+    setSubmissionsOpen(true);
   };
 
   const handleFormSubmit = async () => {
-    if (!title || !phase || !eta || !description || !objective) {
+    if (!title || !phase || !eta || !description || !objective || !assigneeId) {
         toast({
           variant: "destructive",
           title: "Missing Fields",
@@ -115,14 +139,15 @@ export default function TaskManagement({ initialTasks }: { initialTasks: Task[] 
     setIsPending(true);
 
     const taskData = {
-        id: selectedTask ? selectedTask.id : Date.now(), // Use a temporary ID for new tasks
+        id: selectedTask ? selectedTask.id : Date.now(),
         title,
         phase,
         objective,
         description,
         status,
         eta: eta.toISOString(),
-        assigneeId: 1, // Placeholder
+        assigneeId,
+        submissionCount: selectedTask?.submissionCount || 0,
     };
 
     try {
@@ -132,8 +157,8 @@ export default function TaskManagement({ initialTasks }: { initialTasks: Task[] 
           toast({ title: "Task Updated", description: `"${title}" has been successfully updated.` });
           setEditDialogOpen(false);
       } else { // Creating
-          await createTaskAction(taskData);
-          setTasks(prevTasks => [...prevTasks, taskData]);
+          const newId = await createTaskAction(taskData);
+          setTasks(prevTasks => [...prevTasks, {...taskData, id: newId}]);
           toast({ title: "Task Created", description: `"${title}" has been successfully published.` });
           setCreateDialogOpen(false);
       }
@@ -166,11 +191,12 @@ export default function TaskManagement({ initialTasks }: { initialTasks: Task[] 
         });
     }
     setIsPending(false);
+    setDeleteDialogOpen(false);
     setSelectedTask(null);
   };
 
   const TaskForm = (
-    <div className="grid gap-4 py-4">
+    <div className="grid gap-4 py-4 max-h-[70vh] overflow-y-auto pr-4">
         <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="title" className="text-right">Task Title</Label>
             <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} className="col-span-3" placeholder="e.g., D3-T1: Final Model Deployment"/>
@@ -186,6 +212,19 @@ export default function TaskManagement({ initialTasks }: { initialTasks: Task[] 
          <div className="grid grid-cols-4 items-start gap-4">
             <Label htmlFor="description" className="text-right pt-2">Description</Label>
             <Textarea id="description" value={description} onChange={(e) => setDescription(e.target.value)} className="col-span-3" placeholder="Detailed task description"/>
+        </div>
+        <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="assignee" className="text-right">Assignee</Label>
+            <Select onValueChange={(value) => setAssigneeId(Number(value))} value={String(assigneeId)}>
+                <SelectTrigger className="col-span-3">
+                    <SelectValue placeholder="Select an apprentice" />
+                </SelectTrigger>
+                <SelectContent>
+                    {apprentices.map(apprentice => (
+                        <SelectItem key={apprentice.id} value={String(apprentice.id)}>{apprentice.name}</SelectItem>
+                    ))}
+                </SelectContent>
+            </Select>
         </div>
         <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="status" className="text-right">Status</Label>
@@ -225,9 +264,12 @@ export default function TaskManagement({ initialTasks }: { initialTasks: Task[] 
     </div>
   );
 
+  const SubmissionsForTask = selectedTask ? allSubmissions.filter(s => s.taskId === selectedTask.id) : [];
+
   return (
     <div className="space-y-4">
       <div className="flex justify-end">
+        {/* CREATE DIALOG */}
         <Dialog open={isCreateDialogOpen} onOpenChange={setCreateDialogOpen}>
           <DialogTrigger asChild>
             <Button onClick={handleCreateClick}>
@@ -252,7 +294,7 @@ export default function TaskManagement({ initialTasks }: { initialTasks: Task[] 
           </DialogContent>
         </Dialog>
 
-        {/* Edit Dialog */}
+        {/* EDIT DIALOG */}
         <Dialog open={isEditDialogOpen} onOpenChange={setEditDialogOpen}>
             <DialogContent className="sm:max-w-[500px]">
                 <DialogHeader>
@@ -271,70 +313,129 @@ export default function TaskManagement({ initialTasks }: { initialTasks: Task[] 
                 </DialogFooter>
             </DialogContent>
         </Dialog>
+        
+        {/* SUBMISSIONS DIALOG */}
+        <Dialog open={isSubmissionsOpen} onOpenChange={setSubmissionsOpen}>
+            <DialogContent className="sm:max-w-2xl">
+                <DialogHeader>
+                    <DialogTitle>Submissions for "{selectedTask?.title}"</DialogTitle>
+                    <DialogDescription>
+                       Review all deliverables submitted for this task.
+                    </DialogDescription>
+                </DialogHeader>
+                <Table>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead>Apprentice</TableHead>
+                            <TableHead>Submitted At</TableHead>
+                            <TableHead className="text-right">Deliverable</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {SubmissionsForTask.length > 0 ? SubmissionsForTask.map(sub => (
+                            <TableRow key={sub.id}>
+                                <TableCell>{sub.assigneeName}</TableCell>
+                                <TableCell>{format(new Date(sub.submittedAt), "PPpp")}</TableCell>
+                                <TableCell className="text-right">
+                                    <Button asChild variant="outline" size="sm">
+                                        <Link href={sub.fileUrl} target="_blank">
+                                            <Download className="mr-2 h-4 w-4" />
+                                            View File
+                                        </Link>
+                                    </Button>
+                                </TableCell>
+                            </TableRow>
+                        )) : (
+                            <TableRow>
+                                <TableCell colSpan={3} className="text-center">No submissions yet for this task.</TableCell>
+                            </TableRow>
+                        )}
+                    </TableBody>
+                </Table>
+            </DialogContent>
+        </Dialog>
+
+        {/* DELETE ALERT DIALOG */}
+        <AlertDialog open={isDeleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+          <AlertDialogContent>
+              <AlertDialogHeader>
+                  <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                      This action cannot be undone. This will permanently delete the task
+                      "{selectedTask?.title}".
+                  </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                  <AlertDialogCancel onClick={() => setSelectedTask(null)}>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleDeleteConfirm} disabled={isPending}>
+                      {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                      Continue
+                  </AlertDialogAction>
+              </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
 
-       <AlertDialog>
-        <AlertDialogContent>
-            <AlertDialogHeader>
-                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                <AlertDialogDescription>
-                    This action cannot be undone. This will permanently delete the task
-                    "{selectedTask?.title}".
-                </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-                <AlertDialogCancel onClick={() => setSelectedTask(null)}>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={handleDeleteConfirm} disabled={isPending}>
-                    {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    Continue
-                </AlertDialogAction>
-            </AlertDialogFooter>
-        </AlertDialogContent>
-
-        <Table>
-            <TableHeader>
-            <TableRow>
-                <TableHead>Task Title</TableHead>
-                <TableHead>Phase</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Deadline (ETA)</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-            </TableHeader>
-            <TableBody>
-            {tasks.length > 0 ? tasks.map((task) => (
-                <TableRow key={task.id}>
-                <TableCell className="font-medium">{task.title}</TableCell>
-                <TableCell>{task.phase}</TableCell>
-                <TableCell>
-                    <Badge variant={task.status === "Overdue" ? "destructive" : "outline"}>
-                    {task.status}
-                    </Badge>
-                </TableCell>
-                <TableCell>{format(new Date(task.eta), "PPp")}</TableCell>
-                <TableCell className="text-right space-x-2">
-                    <Button variant="outline" size="icon" onClick={() => handleEditClick(task)}>
-                    <Edit className="h-4 w-4" />
-                    <span className="sr-only">Edit Task</span>
-                    </Button>
-                    <AlertDialogTrigger asChild>
-                        <Button variant="destructive" size="icon" onClick={() => handleDeleteClick(task)}>
-                            <Trash2 className="h-4 w-4" />
-                            <span className="sr-only">Delete Task</span>
-                        </Button>
-                    </AlertDialogTrigger>
-                </TableCell>
-                </TableRow>
-            )) : (
-                <TableRow>
-                <TableCell colSpan={5} className="text-center">
-                    No tasks have been created yet.
-                </TableCell>
-                </TableRow>
-            )}
-            </TableBody>
-        </Table>
-      </AlertDialog>
+      <Table>
+          <TableHeader>
+          <TableRow>
+              <TableHead>Task Title</TableHead>
+              <TableHead>Assignee</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Submissions</TableHead>
+              <TableHead>Deadline (ETA)</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+          </TableRow>
+          </TableHeader>
+          <TableBody>
+          {tasks.length > 0 ? tasks.map((task) => {
+              const assignee = apprentices.find(a => a.id === task.assigneeId);
+              return (
+              <TableRow key={task.id}>
+              <TableCell className="font-medium">{task.title}</TableCell>
+              <TableCell>{assignee?.name || 'N/A'}</TableCell>
+              <TableCell>
+                  <Badge variant={task.status === "Overdue" ? "destructive" : "outline"}>
+                  {task.status}
+                  </Badge>
+              </TableCell>
+              <TableCell>{task.submissionCount}</TableCell>
+              <TableCell>{format(new Date(task.eta), "PPp")}</TableCell>
+              <TableCell className="text-right">
+                  <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon">
+                              <MoreHorizontal className="h-4 w-4" />
+                              <span className="sr-only">Task Actions</span>
+                          </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => handleViewSubmissions(task)}>
+                              <View className="mr-2 h-4 w-4" />
+                              View Submissions
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleEditClick(task)}>
+                              <Edit className="mr-2 h-4 w-4" />
+                              Edit Task
+                          </DropdownMenuItem>
+                          <DropdownMenuItem className="text-destructive" onClick={() => handleDeleteTrigger(task)}>
+                              <Trash2 className="mr-2 h-4 w-4" />
+                              Delete Task
+                          </DropdownMenuItem>
+                      </DropdownMenuContent>
+                  </DropdownMenu>
+              </TableCell>
+              </TableRow>
+          )
+          }) : (
+              <TableRow>
+              <TableCell colSpan={6} className="text-center">
+                  No tasks have been created yet.
+              </TableCell>
+              </TableRow>
+          )}
+          </TableBody>
+      </Table>
     </div>
   );
 }

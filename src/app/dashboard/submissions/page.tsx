@@ -23,7 +23,9 @@ export default async function SubmissionsPage() {
   const actionableTasks = allTasks.filter(task => {
     const isActionableStatus = task.status === 'In Progress' || task.status === 'Not Started';
     const isNotOverdue = new Date(task.eta) > now;
-    return isActionableStatus && isNotOverdue;
+    // Also check if task has not been submitted yet
+    const isNotSubmitted = task.status !== 'Submitted';
+    return isActionableStatus && isNotOverdue && isNotSubmitted;
   });
 
   return (
@@ -42,7 +44,7 @@ export default async function SubmissionsPage() {
         {actionableTasks.length > 0 ? (
           <div className="space-y-6">
             {actionableTasks.map(task => (
-                <SubmissionForm key={task.id} task={task} />
+                <SubmissionForm key={task.id} task={task} user={user} />
             ))}
           </div>
         ) : (
