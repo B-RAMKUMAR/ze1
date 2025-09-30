@@ -34,6 +34,7 @@ const navItems: NavItem[] = [
   
   // Apprentice
   { href: "/dashboard/tasks", label: "Active Tasks", icon: ClipboardCheck, roles: ["Apprentice"] },
+  { href: "/dashboard/announcements", label: "Announcements", icon: Megaphone, roles: ["Apprentice"] },
   { href: "/dashboard/journal", label: "AI Journal", icon: FilePen, roles: ["Apprentice"] },
   { href: "/dashboard/submissions", label: "Submit Deliverable", icon: Upload, roles: ["Apprentice"] },
   { href: "/dashboard/scores", label: "My Scores", icon: Trophy, roles: ["Apprentice"] },
