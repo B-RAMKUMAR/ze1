@@ -30,7 +30,7 @@ export default async function PlaybookPage() {
       <main className="flex-1 container mx-auto py-12 px-4 md:px-6">
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-extrabold tracking-tighter text-primary">
-            ZEROS Program Playbook - Phase 0
+            ZEROS Program Playbook - Phase 1
           </h1>
           <p className="mt-4 text-lg text-muted-foreground max-w-3xl mx-auto">
             Your comprehensive guide to the objectives, schedule, and scoring of the ZEROS program.
