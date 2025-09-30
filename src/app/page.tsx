@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { BookOpen, Rocket, LogIn, UserPlus } from "lucide-react";
+import { BookOpen, Rocket, LogIn, UserPlus, Search } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
@@ -18,6 +18,11 @@ export default function Home() {
         <nav className="ml-auto flex gap-4 sm:gap-6">
           <Link href="/playbook">
             <Button variant="ghost">Playbook</Button>
+          </Link>
+           <Link href="/onboarding/track">
+            <Button variant="ghost">
+              <Search className="mr-2 h-4 w-4" /> Track Status
+            </Button>
           </Link>
           <Link href="/login">
             <Button>

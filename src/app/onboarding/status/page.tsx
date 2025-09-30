@@ -45,7 +45,7 @@ function StatusDisplay() {
     }
   }, [email]);
 
-  const getStatusInfo = (status: AccessRequest["status"]) => {
+  const getStatusInfo = (status: AccessRequest["status"] | null | undefined) => {
     switch (status) {
       case "Pending":
         return {
@@ -74,7 +74,7 @@ function StatusDisplay() {
              <Alert variant="default" className="bg-green-500/10 border-green-500/50">
                 <AlertTitle>You're In!</AlertTitle>
                 <AlertDescription>
-                    You can now log in to your dashboard using your Mu Sigma email and the default password `pass123`. We recommend changing your password after your first login.
+                    The next step is to set your password. You can do this from the login page by clicking "Set your password".
                 </AlertDescription>
             </Alert>
           )
@@ -102,9 +102,9 @@ function StatusDisplay() {
           badge: null,
           alert: (
              <Alert>
-                <AlertTitle>Need to enroll?</AlertTitle>
+                <AlertTitle>Need to enroll or check status?</AlertTitle>
                 <AlertDescription>
-                    If you haven't requested enrollment yet, you can start the process now.
+                    If you haven't requested enrollment yet, you can start the process from the onboarding page. To check a status, please enter your email on the tracking page.
                 </AlertDescription>
             </Alert>
           )
@@ -121,7 +121,7 @@ function StatusDisplay() {
     );
   }
   
-  const statusInfo = getStatusInfo(request?.status || "default");
+  const statusInfo = getStatusInfo(request?.status);
 
   return (
     <Card className="mx-auto max-w-lg w-full">
