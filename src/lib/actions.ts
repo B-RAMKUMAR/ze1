@@ -1,11 +1,12 @@
 'use server';
 
 import { generateJournalEntry, type JournalEntryInput } from "@/ai/flows/automated-journal-entry";
-import { getTasksForUser } from "@/lib/data";
+import { getTasks } from "@/lib/data";
 
 export async function createJournalEntryAction(userId: number) {
   try {
-    const tasks = await getTasksForUser(userId);
+    const allTasks = await getTasks();
+    const tasks = allTasks.filter(t => t.assigneeId === userId);
     const recentTasksSummary = tasks.slice(0, 3).map(t => `${t.title} (${t.status})`).join(', ');
 
     // Mock data for other inputs as per the proposal

@@ -14,7 +14,6 @@ import { login } from "@/lib/auth";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 import { AlertCircle, Loader2 } from "lucide-react";
 import { useState, useTransition } from "react";
@@ -26,7 +25,6 @@ const FormSchema = z.object({
 
 
 export function LoginForm() {
-  const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [serverError, setServerError] = useState<string | null>(null);
 

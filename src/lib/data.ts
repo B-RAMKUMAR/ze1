@@ -36,11 +36,6 @@ export async function getTasks(): Promise<Task[]> {
   return data.items || [];
 }
 
-export async function getTasksForUser(userId: number): Promise<Task[]> {
-  const tasks = await getTasks();
-  return tasks;
-}
-
 export async function getAnnouncements(): Promise<Announcement[]> {
   const { data } = await readAndParseMarkdown<Announcement>("announcements.md");
   return (data.items || []).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());

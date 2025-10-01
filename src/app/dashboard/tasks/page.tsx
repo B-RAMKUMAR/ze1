@@ -9,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ClipboardCheck } from "lucide-react";
 import TaskCard from "@/components/dashboard/task-card";
 import { getCurrentUser } from "@/lib/auth";
-import { getTasksForUser } from "@/lib/data";
+import { getTasks } from "@/lib/data";
 import { redirect } from "next/navigation";
 import type { Task } from "@/lib/types";
 
@@ -19,12 +19,13 @@ export default async function TasksPage() {
     redirect("/dashboard");
   }
 
-  const allTasks = await getTasksForUser(user.id);
+  const allTasks = await getTasks();
+  const userTasks = allTasks.filter(task => task.assigneeId === user.id);
 
-  const activeTasks = allTasks.filter(
+  const activeTasks = userTasks.filter(
     (task) => task.status === "In Progress" || task.status === "Not Started"
   );
-  const closedTasks = allTasks.filter(
+  const closedTasks = userTasks.filter(
     (task) =>
       task.status === "Submitted" ||
       task.status === "Scored" ||

@@ -4,12 +4,11 @@ import ApprenticeDashboard from "@/components/dashboard/apprentice-dashboard";
 import OrchestratorDashboard from "@/app/dashboard/orchestrator-dashboard";
 import ScorerDashboard from "@/components/dashboard/scorer-dashboard";
 import OperatorDashboard from "@/components/dashboard/operator-dashboard";
-import { getAnnouncements, getTasksForUser, getSubmissions, getAccessRequests, getUsers } from "@/lib/data";
+import { getAnnouncements, getTasks, getSubmissions, getAccessRequests, getUsers } from "@/lib/data";
 
 export default async function DashboardPage() {
   const user = await getCurrentUser();
 
-  // This check is important for the main dashboard page
   if (!user) {
     redirect("/login");
   }
@@ -18,8 +17,9 @@ export default async function DashboardPage() {
 
   switch (user.role) {
     case "Apprentice":
-      const tasks = await getTasksForUser(user.id);
-      return <ApprenticeDashboard user={user} tasks={tasks} announcements={announcements} />;
+      const tasks = await getTasks();
+      const userTasks = tasks.filter(t => t.assigneeId === user.id);
+      return <ApprenticeDashboard user={user} tasks={userTasks} announcements={announcements} />;
     case "Program Orchestrator":
       const requests = await getAccessRequests();
       const users = await getUsers();
