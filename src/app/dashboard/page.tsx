@@ -1,7 +1,7 @@
 import { getCurrentUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import ApprenticeDashboard from "@/components/dashboard/apprentice-dashboard";
-import OrchestratorDashboard from "@/components/dashboard/orchestrator-dashboard";
+import OrchestratorDashboard from "@/app/dashboard/orchestrator-dashboard";
 import ScorerDashboard from "@/components/dashboard/scorer-dashboard";
 import OperatorDashboard from "@/components/dashboard/operator-dashboard";
 import { getAnnouncements, getTasksForUser, getSubmissions, getAccessRequests, getUsers } from "@/lib/data";
