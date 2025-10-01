@@ -4,7 +4,7 @@ import fs from "fs/promises";
 import path from "path";
 import matter from "gray-matter";
 import { revalidatePath } from "next/cache";
-import type { AccessRequest, User } from "./types";
+import type { AccessRequest, User } from "@/lib/types";
 
 const contentDirectory = path.join(process.cwd(), "samplemd");
 const requestsFilePath = path.join(contentDirectory, "requests.md");

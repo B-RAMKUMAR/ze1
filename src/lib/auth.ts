@@ -1,7 +1,7 @@
 'use server';
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { User } from "./types";
+import type { User } from "@/lib/types";
 import { getUsers } from "./data";
 import fs from "fs/promises";
 import path from "path";

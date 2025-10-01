@@ -4,7 +4,7 @@ import fs from "fs/promises";
 import path from "path";
 import matter from "gray-matter";
 import { revalidatePath } from "next/cache";
-import type { Task } from "./types";
+import type { Task } from "@/lib/types";
 
 const contentDirectory = path.join(process.cwd(), "samplemd");
 const tasksFilePath = path.join(contentDirectory, "tasks.md");
