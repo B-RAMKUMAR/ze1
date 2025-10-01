@@ -1,4 +1,4 @@
-'use server';
+"use server";
 
 import { generateJournalEntry, type JournalEntryInput } from "@/ai/flows/automated-journal-entry";
 import { getTasksForUser } from "@/lib/data";
