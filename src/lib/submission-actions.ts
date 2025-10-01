@@ -11,14 +11,6 @@ const submissionsFilePath = path.join(contentDirectory, "submissions.md");
 const tasksFilePath = path.join(contentDirectory, "tasks.md");
 const uploadsDirectory = path.join(process.cwd(), "public/uploads");
 
-type CreateSubmissionInput = {
-    submissionId?: number;
-    taskId: number;
-    taskTitle: string;
-    assigneeId: number;
-    assigneeName: string;
-};
-
 // --- Submissions File ---
 async function readSubmissionsFile(): Promise<{ content: string; data: { items: Submission[] } }> {
   await fs.mkdir(uploadsDirectory, { recursive: true }); // Ensure uploads directory exists

@@ -1,23 +1,23 @@
 import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-  } from "@/components/ui/card";
-  import type { User, Announcement, AccessRequest } from "@/lib/types";
-  import { Button } from "@/components/ui/button";
-  import { Check, UserPlus, Megaphone, X, ArrowRight } from "lucide-react";
-  import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-  } from "@/components/ui/table";
-  import { Badge } from "@/components/ui/badge";
-  import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import type { User, Announcement, AccessRequest } from "@/lib/types";
+import { Button } from "@/components/ui/button";
+import { Check, UserPlus, Megaphone, X, ArrowRight } from "lucide-react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Link from "next/link";
   
   type OrchestratorDashboardProps = {

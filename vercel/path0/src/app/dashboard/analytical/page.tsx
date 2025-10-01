@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Card,
   CardContent,
@@ -27,10 +29,21 @@ import {
   User,
 } from "lucide-react";
 import type { Submission, Task } from "@/lib/types";
+import { useEffect, useState } from "react";
 
-export default async function AnalyticalDashboardPage() {
-  const submissions = await getSubmissions();
-  const tasks = await getTasks();
+export default function AnalyticalDashboardPage() {
+  const [submissions, setSubmissions] = useState<Submission[]>([]);
+  const [tasks, setTasks] = useState<Task[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const subs = await getSubmissions();
+      const tks = await getTasks();
+      setSubmissions(subs);
+      setTasks(tks);
+    };
+    fetchData();
+  }, []);
 
   const totalSubmissions = submissions.length;
   const totalTasks = tasks.length;
