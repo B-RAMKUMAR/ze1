@@ -30,8 +30,8 @@ async function writeUsersFile(users: User[], originalContent: string): Promise<v
 }
 
 
-export async function login(data: unknown): Promise<{ error: string } | { success: true }> {
-  const validation = loginSchema.safeParse(data);
+export async function login(formData: unknown): Promise<{ error: string } | { success: true }> {
+  const validation = loginSchema.safeParse(formData);
   if (!validation.success) {
     return { error: "Invalid data format." };
   }
@@ -55,11 +55,12 @@ export async function login(data: unknown): Promise<{ error: string } | { succes
       maxAge: 60 * 60 * 24, // 1 day
       path: "/",
     });
-    // Redirect on success
-    redirect("/dashboard");
+    // Redirect must be called outside of a try/catch block.
   } else {
     return { error: "Invalid email or password." };
   }
+
+  redirect("/dashboard");
 }
 
 export async function logout() {
@@ -69,10 +70,11 @@ export async function logout() {
 
 export async function getCurrentUser(): Promise<User | null> {
   const userCookie = cookies().get("currentUser")?.value;
-  if (userCookie) {
+  if (userCookie && typeof userCookie === 'string' && userCookie.trim() !== '') {
     try {
       return JSON.parse(userCookie) as User;
     } catch (e) {
+      console.error("Failed to parse user cookie:", e);
       return null;
     }
   }
