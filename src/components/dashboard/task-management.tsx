@@ -25,6 +25,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
   AlertDialog,
@@ -45,18 +46,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
 import { Textarea } from "@/components/ui/textarea";
-import { PlusCircle, MoreHorizontal, Download, Edit, Trash2, CalendarIcon, Loader2, View } from "lucide-react";
+import { PlusCircle, MoreHorizontal, Download, Edit, Trash2, Loader2, View } from "lucide-react";
 import { format } from "date-fns";
-import { cn } from "@/lib/utils";
 import { createTaskAction, updateTaskAction, deleteTaskAction } from "@/lib/task-actions";
 import { useToast } from "@/hooks/use-toast";
+import DatePicker from "./date-picker";
 
 export default function TaskManagement({ 
   initialTasks,
@@ -241,23 +236,7 @@ export default function TaskManagement({
         </div>
         <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="eta" className="text-right">Deadline (ETA)</Label>
-            <Popover>
-                <PopoverTrigger asChild>
-                    <Button
-                    variant={"outline"}
-                    className={cn(
-                        "col-span-3 justify-start text-left font-normal",
-                        !eta && "text-muted-foreground"
-                    )}
-                    >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {eta ? format(eta, "PPP") : <span>Pick a date</span>}
-                    </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar mode="single" selected={eta} onSelect={setEta} initialFocus />
-                </PopoverContent>
-            </Popover>
+            <DatePicker date={eta} setDate={setEta} />
         </div>
     </div>
   );
@@ -364,7 +343,7 @@ export default function TaskManagement({
                   </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                  <AlertDialogCancel onClick={() => setSelectedTask(null)}>Cancel</AlertDialogCancel>
+                  <AlertDialogCancel onClick={() => setSelectedUser(null)}>Cancel</AlertDialogCancel>
                   <AlertDialogAction onClick={handleDeleteConfirm} disabled={isPending}>
                       {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                       Continue
