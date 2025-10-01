@@ -62,6 +62,7 @@ import { useToast } from "@/hooks/use-toast";
 export default function TaskManagement({ 
   initialTasks,
   allSubmissions,
+  apprentices,
 }: { 
   initialTasks: Task[];
   allSubmissions: Submission[];
@@ -84,6 +85,7 @@ export default function TaskManagement({
   const [objective, setObjective] = useState("");
   const [status, setStatus] = useState<Task["status"]>("Not Started");
   const [eta, setEta] = useState<Date>();
+  const [assigneeId, setAssigneeId] = useState<number | undefined>();
 
   const resetForm = () => {
     setTitle("");
@@ -92,6 +94,7 @@ export default function TaskManagement({
     setObjective("");
     setStatus("Not Started");
     setEta(undefined);
+    setAssigneeId(undefined);
     setSelectedTask(null);
   };
 
@@ -108,6 +111,7 @@ export default function TaskManagement({
     setObjective(task.objective);
     setStatus(task.status);
     setEta(new Date(task.eta));
+    setAssigneeId(task.assigneeId);
     setEditDialogOpen(true);
   };
   
@@ -122,18 +126,18 @@ export default function TaskManagement({
   };
 
   const handleFormSubmit = async () => {
-    if (!title || !phase || !eta || !description || !objective) {
+    if (!title || !phase || !eta || !description || !objective || !assigneeId) {
         toast({
           variant: "destructive",
           title: "Missing Fields",
-          description: "Please fill out all required fields.",
+          description: "Please fill out all required fields, including assignee.",
         });
         return;
     }
     
     setIsPending(true);
 
-    const taskData = {
+    const taskData: Task = {
         id: selectedTask ? selectedTask.id : Date.now(),
         title,
         phase,
@@ -141,6 +145,7 @@ export default function TaskManagement({
         description,
         status,
         eta: eta.toISOString(),
+        assigneeId: assigneeId,
         submissionCount: selectedTask?.submissionCount || 0,
     };
 
@@ -208,6 +213,19 @@ export default function TaskManagement({
             <Textarea id="description" value={description} onChange={(e) => setDescription(e.target.value)} className="col-span-3" placeholder="Detailed task description"/>
         </div>
         <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="assignee" className="text-right">Assignee</Label>
+             <Select onValueChange={(value) => setAssigneeId(Number(value))} value={assigneeId?.toString()}>
+                <SelectTrigger className="col-span-3">
+                    <SelectValue placeholder="Select an Apprentice" />
+                </SelectTrigger>
+                <SelectContent>
+                    {apprentices.map(apprentice => (
+                        <SelectItem key={apprentice.id} value={apprentice.id.toString()}>{apprentice.name}</SelectItem>
+                    ))}
+                </SelectContent>
+            </Select>
+        </div>
+        <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="status" className="text-right">Status</Label>
             <Select onValueChange={(value: Task["status"]) => setStatus(value)} value={status}>
                 <SelectTrigger className="col-span-3">
@@ -229,7 +247,7 @@ export default function TaskManagement({
                     <Button
                     variant={"outline"}
                     className={cn(
-                        "w-[240px] justify-start text-left font-normal",
+                        "col-span-3 justify-start text-left font-normal",
                         !eta && "text-muted-foreground"
                     )}
                     >
@@ -369,9 +387,13 @@ export default function TaskManagement({
           </TableHeader>
           <TableBody>
           {tasks.length > 0 ? tasks.map((task) => {
+              const assignee = apprentices.find(a => a.id === task.assigneeId);
               return (
               <TableRow key={task.id}>
-              <TableCell className="font-medium">{task.title}</TableCell>
+              <TableCell className="font-medium">
+                <div>{task.title}</div>
+                <div className="text-xs text-muted-foreground">{assignee ? assignee.name : 'Unassigned'}</div>
+              </TableCell>
               <TableCell>
                   <Badge variant={task.status === "Overdue" ? "destructive" : "outline"}>
                   {task.status}
