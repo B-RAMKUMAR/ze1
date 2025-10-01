@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/card";
 import { Upload } from "lucide-react";
 import { getCurrentUser } from "@/lib/auth";
-import { getTasksForUser, getSubmissions } from "@/lib/data";
+import { getTasks, getSubmissions } from "@/lib/data";
 import { redirect } from "next/navigation";
 import SubmissionForm from "@/components/dashboard/submission-form";
 import type { Submission } from "@/lib/types";
@@ -18,7 +18,8 @@ export default async function SubmissionsPage() {
     redirect("/dashboard");
   }
 
-  const allTasks = await getTasksForUser(user.id);
+  const allTasks = await getTasks();
+  const userTasks = allTasks.filter(task => task.assigneeId === user.id);
   const allSubmissions = await getSubmissions();
   
   const userSubmissions = allSubmissions.filter(s => s.assigneeId === user.id);
@@ -26,7 +27,7 @@ export default async function SubmissionsPage() {
   
   const now = new Date();
   
-  const tasksToDisplay = allTasks.filter(task => {
+  const tasksToDisplay = userTasks.filter(task => {
     // Exclude tasks that are already scored or are overdue and not yet submitted
     if(task.status === 'Scored') return false;
     if(new Date(task.eta) < now && !submittedTaskIds.has(task.id)) return false;
