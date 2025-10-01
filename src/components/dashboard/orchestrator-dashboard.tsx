@@ -6,7 +6,7 @@ import {
     CardTitle,
   } from "@/components/ui/card";
   import type { User, Announcement, AccessRequest } from "@/lib/types";
-  import { Button } from "../ui/button";
+  import { Button } from "@/components/ui/button";
   import { Check, UserPlus, Megaphone, X } from "lucide-react";
   import {
     Table,
@@ -16,8 +16,8 @@ import {
     TableHeader,
     TableRow,
   } from "@/components/ui/table";
-  import { Badge } from "../ui/badge";
-  import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+  import { Badge } from "@/components/ui/badge";
+  import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
   
   type OrchestratorDashboardProps = {
     user: User;
