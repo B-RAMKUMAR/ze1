@@ -25,7 +25,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
   AlertDialog,
@@ -399,7 +398,7 @@ export default function TaskManagement({
                   {task.status}
                   </Badge>
               </TableCell>
-              <TableCell>{task.submissionCount}</TableCell>
+              <TableCell>{task.submissionCount || 0}</TableCell>
               <TableCell>{format(new Date(task.eta), "PPp")}</TableCell>
               <TableCell className="text-right">
                   <DropdownMenu>
