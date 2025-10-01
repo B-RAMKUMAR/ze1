@@ -116,12 +116,18 @@ export default async function ScoresPage() {
                                 {task.submissions.map(sub => (
                                     <TableRow key={sub.id}>
                                         <TableCell className="font-medium">{sub.assigneeName}</TableCell>
-                                        <TableCell>{sub.scorer}</TableCell>
-                                        <TableCell>{sub.scores.depth}</TableCell>
-                                        <TableCell>{sub.scores.relevance}</TableCell>
-                                        <TableCell>{sub.scores.applicability}</TableCell>
-                                        <TableCell>{sub.scores.novelty}</TableCell>
-                                        <TableCell>{sub.scores.packaging}</TableCell>
+                                        <TableCell>{sub.scorer || 'N/A'}</TableCell>
+                                        {sub.scores ? (
+                                            <>
+                                                <TableCell>{sub.scores.depth}</TableCell>
+                                                <TableCell>{sub.scores.relevance}</TableCell>
+                                                <TableCell>{sub.scores.applicability}</TableCell>
+                                                <TableCell>{sub.scores.novelty}</TableCell>
+                                                <TableCell>{sub.scores.packaging}</TableCell>
+                                            </>
+                                        ) : (
+                                            <TableCell colSpan={5} className="text-center">N/A</TableCell>
+                                        )}
                                         <TableCell>
                                             <Badge variant="secondary">{sub.average.toFixed(2)}</Badge>
                                         </TableCell>
