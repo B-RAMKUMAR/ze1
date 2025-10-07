@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { UserPlus, Loader2, CheckCircle, ArrowRight, Rocket } from "lucide-react";
+import { UserPlus, Loader2, CheckCircle, ArrowRight } from "lucide-react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -83,7 +83,7 @@ export default function OnboardingRequestPage() {
        <div className="flex items-center justify-center min-h-screen bg-muted/40 relative">
             <div className="absolute top-4 left-4">
               <Link href="/" className="flex items-center justify-center gap-2">
-                <Rocket className="h-6 w-6 text-accent" />
+                <img src="/mu-sigma-logo.png" alt="Mu Sigma" width={100} height={32} />
                 <span className="text-xl font-bold tracking-tighter">ZEROS Launchpad</span>
               </Link>
             </div>
@@ -119,7 +119,7 @@ export default function OnboardingRequestPage() {
     <div className="flex items-center justify-center min-h-screen bg-muted/40 relative">
       <div className="absolute top-4 left-4">
         <Link href="/" className="flex items-center justify-center gap-2">
-          <Rocket className="h-6 w-6 text-accent" />
+          <img src="/mu-sigma-logo.png" alt="Mu Sigma" width={100} height={32} />
           <span className="text-xl font-bold tracking-tighter">ZEROS Launchpad</span>
         </Link>
       </div>

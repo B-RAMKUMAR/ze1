@@ -19,7 +19,7 @@ export default async function SubmissionsPage() {
   }
 
   const allTasks = await getTasks();
-  const userTasks = allTasks.filter(task => task.assigneeId === user.id);
+  const userTasks = allTasks.filter(task => !task.assigneeId || task.assigneeId === user.id);
   const allSubmissions = await getSubmissions();
   
   const userSubmissions = allSubmissions.filter(s => s.assigneeId === user.id);

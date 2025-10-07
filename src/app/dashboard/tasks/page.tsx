@@ -20,7 +20,7 @@ export default async function TasksPage() {
   }
 
   const allTasks = await getTasks();
-  const userTasks = allTasks.filter(task => task.assigneeId === user.id);
+  const userTasks = allTasks.filter(task => !task.assigneeId || task.assigneeId === user.id);
 
   const activeTasks = userTasks.filter(
     (task) => task.status === "In Progress" || task.status === "Not Started"

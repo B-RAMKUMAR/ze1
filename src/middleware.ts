@@ -5,11 +5,13 @@ export function middleware(request: NextRequest) {
   const currentUser = request.cookies.get('currentUser')?.value
   const { pathname } = request.nextUrl
 
+  // If trying to access dashboard while not logged in, redirect to login
   if (pathname.startsWith('/dashboard') && !currentUser) {
     request.nextUrl.pathname = '/login'
     return NextResponse.redirect(request.nextUrl)
   }
 
+  // If trying to access login page while already logged in, redirect to dashboard
   if (pathname.startsWith('/login') && currentUser) {
     request.nextUrl.pathname = '/dashboard'
     return NextResponse.redirect(request.nextUrl)
@@ -19,5 +21,6 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
+  // Match all paths except for API routes, static files, and images
   matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
 }

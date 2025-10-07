@@ -30,7 +30,7 @@ export default async function JournalPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <JournalGenerator userId={user.id} />
+          <JournalGenerator />
         </CardContent>
       </Card>
     </div>

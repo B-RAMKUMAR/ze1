@@ -36,5 +36,11 @@ items:
     role: Apprentice
     avatar: /avatars/1.png
     password: pass123
+  - id: 8
+    name: AZEEM
+    email: AZEEM@mu-sigma.com
+    role: Apprentice
+    avatar: /avatars/3.png
+    password: pass123
 ---
 

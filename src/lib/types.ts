@@ -18,7 +18,7 @@ export type Task = {
   objective: string;
   eta: string; 
   status: TaskStatus;
-  assigneeId: number;
+  assigneeId?: number;
   description: string;
   score?: number;
   submissionCount?: number;

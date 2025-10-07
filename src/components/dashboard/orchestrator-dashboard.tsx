@@ -109,7 +109,7 @@ export default function OrchestratorDashboard({ user, announcements, requests: i
                                   <Button variant="outline" size="icon" onClick={() => handleReject(req.id, req.userName)} disabled={isPending}>
                                     {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <X className="h-4 w-4" />}
                                   </Button>
-                                  <Button size="icon" onClick={() => handleApprove(req.id, req.userName)} disabled={isPending}>
+                                  <Button size="icon" onClick={() => handleApprove(.id, req.userName)} disabled={isPending}>
                                     {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
                                   </Button>
                               </TableCell>

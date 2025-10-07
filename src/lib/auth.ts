@@ -46,7 +46,6 @@ export async function login(formData: unknown): Promise<{ error: string } | { su
   const user = users.find((u) => u.email.toLowerCase() === email.toLowerCase());
 
   if (user && user.password === password) {
-    // Omit password from the cookie
     const { password: _password, ...userToStore } = user;
     
     cookies().set("currentUser", JSON.stringify(userToStore), {
@@ -55,12 +54,11 @@ export async function login(formData: unknown): Promise<{ error: string } | { su
       maxAge: 60 * 60 * 24, // 1 day
       path: "/",
     });
-    // Redirect must be called outside of a try/catch block.
+    revalidatePath("/dashboard");
+    return { success: true };
   } else {
     return { error: "Invalid email or password." };
   }
-
-  redirect("/dashboard");
 }
 
 export async function logout() {

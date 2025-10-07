@@ -8,7 +8,7 @@ import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { ScrollArea } from "../ui/scroll-area";
 
-export default function JournalGenerator({ userId }: { userId: number }) {
+export default function JournalGenerator() {
   const [isLoading, setIsLoading] = useState(false);
   const [journalEntry, setJournalEntry] = useState("");
   const { toast } = useToast();
@@ -17,7 +17,7 @@ export default function JournalGenerator({ userId }: { userId: number }) {
     setIsLoading(true);
     setJournalEntry("");
     try {
-      const result = await createJournalEntryAction(userId);
+      const result = await createJournalEntryAction();
       if (result.success && result.data) {
         setJournalEntry(result.data.journalEntry);
         toast({

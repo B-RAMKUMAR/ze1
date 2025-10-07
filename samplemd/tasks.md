@@ -119,5 +119,44 @@ items:
     status: In Progress
     eta: '2025-10-22T18:30:00.000Z'
     submissionCount: 0
+  - id: 1759824772786
+    title: 'D3:T1-POWERBI'
+    phase: 'PAHSE1:BEGINNING'
+    objective: 'understanding of overall topics '
+    description: BASIC UNDERSTANDING ABOUT THE CHARTS
+    status: In Progress
+    eta: '2025-10-07T18:30:00.000Z'
+    assigneeId: 1
+    submissionCount: 0
+  - title: 'd3:t1-hi'
+    phase: bye
+    objective: fine
+    description: fine
+    eta: '2025-10-07T18:30:00.000Z'
+    assigneeId: 6
+    id: 1759824772787
+    status: In Progress
+  - title: d3
+    phase: e3
+    objective: e3e3
+    description: e3
+    eta: '2025-10-07T18:30:00.000Z'
+    assigneeId: 1
+    id: 1759824772788
+    status: In Progress
+  - title: t3d1
+    phase: ss
+    objective: ss
+    description: s
+    eta: '2025-10-08T18:30:00.000Z'
+    id: 1759824772789
+    status: In Progress
+  - title: dnckjenjknkjedfnckjnek
+    phase: k cj fdk
+    objective: ' fc fd cf'
+    description: dsncjnwsdkn
+    eta: '2025-10-30T18:30:00.000Z'
+    id: 1759824772790
+    status: In Progress
 ---
 

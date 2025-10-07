@@ -13,7 +13,6 @@ import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Menu,
-  Rocket,
 } from "lucide-react";
 import SidebarNav from "@/components/dashboard/sidebar-nav";
 import { logout, getCurrentUser } from "@/lib/auth";
@@ -39,7 +38,7 @@ export default async function DashboardLayout({
         <div className="flex h-full max-h-screen flex-col gap-2">
           <div className="flex h-16 items-center border-b px-4 lg:px-6">
             <Link href="/" className="flex items-center gap-2 font-semibold">
-              <Rocket className="h-6 w-6 text-accent" />
+              <img src="/mu-sigma-logo.png" alt="Mu Sigma" width={100} height={32} />
               <span className="">ZEROS Launchpad</span>
             </Link>
           </div>

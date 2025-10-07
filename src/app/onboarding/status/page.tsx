@@ -17,7 +17,6 @@ import {
   CheckCircle,
   XCircle,
   FileQuestion,
-  Rocket,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
@@ -172,7 +171,7 @@ export default function OnboardingStatusPage() {
         <div className="flex items-center justify-center min-h-screen bg-muted/40 relative">
             <div className="absolute top-4 left-4">
               <Link href="/" className="flex items-center justify-center gap-2">
-                <Rocket className="h-6 w-6 text-accent" />
+                <img src="/mu-sigma-logo.png" alt="Mu Sigma" width={100} height={32} />
                 <span className="text-xl font-bold tracking-tighter">ZEROS Launchpad</span>
               </Link>
             </div>

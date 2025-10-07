@@ -17,12 +17,24 @@ items:
     userEmail: AZEEM@mu-sigma.com
     userRole: APPRENTICE
     requestedAt: '2025-09-30T08:58:29.936Z'
-    status: Pending
+    status: Approved
   - id: 4
     userName: vignesh nayar
     userEmail: vignesh.nayar@mu-sigma.com
     userRole: APPRENTICE
     requestedAt: '2025-09-30T09:02:58.191Z'
     status: Approved
+  - id: 5
+    userName: Manchu Sana
+    userEmail: Sana.Manchu@mu-sigma.com
+    userRole: APPRENTICE
+    requestedAt: '2025-10-07T09:34:50.588Z'
+    status: Approved
+  - id: 6
+    userName: sana
+    userEmail: sana.manchu@mu-sigma.com
+    userRole: AL
+    requestedAt: '2025-10-07T10:27:12.431Z'
+    status: Pending
 ---
 

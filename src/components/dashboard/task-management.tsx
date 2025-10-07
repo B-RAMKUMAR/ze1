@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useState } from "react";
 import type { Task, Submission, User } from "@/lib/types";
@@ -120,38 +120,45 @@ export default function TaskManagement({
   };
 
   const handleFormSubmit = async () => {
-    if (!title || !phase || !eta || !description || !objective || !assigneeId) {
+    if (!title || !phase || !eta || !description || !objective) {
         toast({
           variant: "destructive",
           title: "Missing Fields",
-          description: "Please fill out all required fields, including assignee.",
+          description: "Please fill out all required fields.",
         });
         return;
     }
     
     setIsPending(true);
 
-    const taskData: Task = {
-        id: selectedTask ? selectedTask.id : Date.now(),
-        title,
-        phase,
-        objective,
-        description,
-        status,
-        eta: eta.toISOString(),
-        assigneeId: assigneeId,
-        submissionCount: selectedTask?.submissionCount || 0,
-    };
-
     try {
       if (selectedTask) { // Updating
+          const taskData: Task = {
+              id: selectedTask.id,
+              title,
+              phase,
+              objective,
+              description,
+              status,
+              eta: eta.toISOString(),
+              assigneeId: assigneeId,
+              submissionCount: selectedTask?.submissionCount || 0,
+          };
           await updateTaskAction(taskData);
           setTasks(tasks.map(t => t.id === selectedTask.id ? taskData : t));
           toast({ title: "Task Updated", description: `"${title}" has been successfully updated.` });
           setEditDialogOpen(false);
       } else { // Creating
+          const taskData = {
+            title,
+            phase,
+            objective,
+            description,
+            eta: eta.toISOString(),
+            assigneeId: assigneeId,
+          };
           await createTaskAction(taskData);
-          setTasks(prevTasks => [...prevTasks, {...taskData, id: taskData.id}]);
+          // Re-fetch or update the tasks list here if necessary
           toast({ title: "Task Created", description: `"${title}" has been successfully published.` });
           setCreateDialogOpen(false);
       }
@@ -210,7 +217,7 @@ export default function TaskManagement({
             <Label htmlFor="assignee" className="text-right">Assignee</Label>
              <Select onValueChange={(value) => setAssigneeId(Number(value))} value={assigneeId?.toString()}>
                 <SelectTrigger className="col-span-3">
-                    <SelectValue placeholder="Select an Apprentice" />
+                    <SelectValue placeholder="Select an Apprentice (Optional)" />
                 </SelectTrigger>
                 <SelectContent>
                     {apprentices.map(apprentice => (
@@ -219,21 +226,23 @@ export default function TaskManagement({
                 </SelectContent>
             </Select>
         </div>
-        <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="status" className="text-right">Status</Label>
-            <Select onValueChange={(value: Task["status"]) => setStatus(value)} value={status}>
-                <SelectTrigger className="col-span-3">
-                    <SelectValue placeholder="Select a status" />
-                </SelectTrigger>
-                <SelectContent>
-                    <SelectItem value="Not Started">Not Started</SelectItem>
-                    <SelectItem value="In Progress">In Progress</SelectItem>
-                    <SelectItem value="Submitted">Submitted</SelectItem>
-                    <SelectItem value="Scored">Scored</SelectItem>
-                    <SelectItem value="Overdue">Overdue</SelectItem>
-                </SelectContent>
-            </Select>
-        </div>
+        {isEditDialogOpen && (
+          <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="status" className="text-right">Status</Label>
+              <Select onValueChange={(value: Task["status"]) => setStatus(value)} value={status}>
+                  <SelectTrigger className="col-span-3">
+                      <SelectValue placeholder="Select a status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                      <SelectItem value="Not Started">Not Started</SelectItem>
+                      <SelectItem value="In Progress">In Progress</SelectItem>
+                      <SelectItem value="Submitted">Submitted</SelectItem>
+                      <SelectItem value="Scored">Scored</SelectItem>
+                      <SelectItem value="Overdue">Overdue</SelectItem>
+                  </SelectContent>
+              </Select>
+          </div>
+        )}
         <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="eta" className="text-right">Deadline (ETA)</Label>
             <DatePicker date={eta} setDate={setEta} />
